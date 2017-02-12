@@ -24,6 +24,9 @@ setup(name='nbcollate',
           'numpy',
           'python-Levenshtein',
       ],
+      setup_requires=[
+          'pytest-runner',
+      ],
       tests_require=[
           'pytest',
       ],
