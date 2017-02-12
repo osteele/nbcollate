@@ -32,18 +32,18 @@ CLEAR_OUTPUTS = True
 
 def nb_add_metadata(nb):
     """Add metadata to a notebook."""
-    for cell in nb['cells']:
-        if cell['cell_type'] == 'markdown' and cell['source']:
-            if re.match(QUESTION_RE, cell['source'], re.IGNORECASE):
-                cell['metadata']['is_question'] = True
-            elif re.match(POLL_RE, cell['source'], re.IGNORECASE):
-                cell['metadata']['is_question'] = True
-                cell['metadata']['is_poll'] = True
+    for cell in nb.cells:
+        if cell.cell_type == 'markdown' and cell.source:
+            if re.match(QUESTION_RE, cell.source, re.IGNORECASE):
+                cell.metadata['is_question'] = True
+            elif re.match(POLL_RE, cell.source, re.IGNORECASE):
+                cell.metadata['is_question'] = True
+                cell.metadata['is_poll'] = True
 
 
 def nb_clear_output(nb):
     """Clear the output cells from a Jupyter notebook."""
-    for cell in nb['cells']:
+    for cell in nb.cells:
         if 'outputs' in cell:
             cell['outputs'] = []
 
@@ -81,11 +81,11 @@ class NotebookExtractor(object):
         """
         prompts = []
         prev_prompt = None
-        for idx, cell in enumerate(self.template['cells']):
-            is_final_cell = idx + 1 == len(self.template['cells'])
-            metadata = cell['metadata']
+        for idx, cell in enumerate(self.template.cells):
+            is_final_cell = idx + 1 == len(self.template.cells)
+            metadata = cell.metadata
             if metadata.get('is_question', False):
-                cell_source = cell['source']
+                cell_source = cell.source
                 if prev_prompt is not None:
                     prompts[-1].stop_md = cell_source
                 is_poll = metadata.get('is_poll', 'Reading Journal feedback' in cell_source.split('\n')[0])
@@ -117,12 +117,12 @@ class NotebookExtractor(object):
                     continue
                 suppress_non_answer = bool(prompt.answers)
                 response_cells = \
-                    prompt.get_closest_match(notebook_content['cells'],
+                    prompt.get_closest_match(notebook_content.cells,
                                              NotebookExtractor.MATCH_THRESH,
                                              suppress_non_answer)
                 if not response_cells:
                     status = 'missed'
-                elif not response_cells[-1]['source'] or not NotebookUtils.cell_list_text(response_cells):
+                elif not response_cells[-1].source or not NotebookUtils.cell_list_text(response_cells):
                     status = 'blank'
                 else:
                     status = 'answered'
@@ -131,7 +131,7 @@ class NotebookExtractor(object):
                         # This is kind of a bass-ackwards way to do this; it's incremental from the previous
                         # strategy.
                         prompt.cells = [cell for cell in response_cells
-                                        if cell['metadata'].get('is_question', False)]
+                                        if cell.metadata.get('is_question', False)]
                         response_cells = [cell for cell in response_cells if cell not in prompt.cells]
                     prompt.answers[gh_username] = response_cells
                 prompt.answer_status[gh_username] = status
@@ -162,7 +162,7 @@ class NotebookExtractor(object):
                 filtered_cells.extend(response_cells)
 
         answer_book = deepcopy(self.template)
-        answer_book['cells'] = filtered_cells
+        answer_book.cells = filtered_cells
         return answer_book
 
     def report_missing_answers(self):
@@ -203,7 +203,7 @@ class QuestionPrompt(object):
         answers = dict(self.answers)
         answer_strings = set()  # answers to this question, as strings; used to avoid duplicates
         for username, response_cells in self.answers.items():
-            answer_string = '\n'.join(cell['source'] for cell in response_cells).strip()
+            answer_string = '\n'.join(cell.source for cell in response_cells).strip()
             if answer_string in answer_strings:
                 del answers[username]
             else:
@@ -232,7 +232,7 @@ class QuestionPrompt(object):
         If no match is better than the matching_threshold, the empty list will be returned.
         """
         return_value = []
-        distances = [Levenshtein.distance(self.start_md, cell['source'])
+        distances = [Levenshtein.distance(self.start_md, cell.source)
                      for cell in cells]
         if min(distances) > matching_threshold:
             return return_value
@@ -243,7 +243,7 @@ class QuestionPrompt(object):
         elif len(self.stop_md) == 0:
             end_offset = len(cells) - best_match
         else:
-            distances = [Levenshtein.distance(self.stop_md, cell['source'])
+            distances = [Levenshtein.distance(self.stop_md, cell.source)
                          for cell in cells[best_match:]]
             if min(distances) > matching_threshold:
                 return return_value
@@ -271,4 +271,4 @@ class NotebookUtils(object):
 
     @staticmethod
     def cell_list_text(cells):
-        return ''.join(cell['source'] for cell in cells).strip()
+        return ''.join(cell.source for cell in cells).strip()
