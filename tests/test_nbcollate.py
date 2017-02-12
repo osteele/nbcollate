@@ -1,4 +1,3 @@
-# import pytest
 import os
 import re
 from collections import OrderedDict
@@ -8,16 +7,27 @@ import nbformat
 from nbcollate import NotebookExtractor, nb_add_metadata, nbcollate
 
 
-def notebook(path):
-    if not path.endswith('.ipynb'):
-        path += '.ipynb'
-    nb = nbformat.read(os.path.join(os.path.dirname(__file__), 'files', path), as_version=4)
+def read_notebook(basename):
+    if not basename.endswith('.ipynb'):
+        basename += '.ipynb'
+    nb = nbformat.read(os.path.join(os.path.dirname(__file__), 'files', basename), as_version=4)
     nb_add_metadata(nb)
     return nb
 
-assignment_nb = notebook('assignment')
-student_notebooks = OrderedDict({student_name: notebook(student_name)
-                                 for student_name in ['student-1', 'student-2', 'student-3']})
+
+def maybe_write_notebook(nb, basename):
+    if not os.environ.get('PYTEST_SAVE_OUTPUTS', False):
+        return
+    if not basename.endswith('.ipynb'):
+        basename += '.ipynb'
+    output_path = os.path.join(os.path.dirname(__file__), 'build', basename)
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    nbformat.write(nb, open(output_path, 'w'))
+
+
+assignment_nb = read_notebook('assignment')
+student_notebooks = OrderedDict((student_name, read_notebook(student_name))
+                                for student_name in ['student-1', 'student-2', 'student-3'])
 
 
 # maybe some of this should be exposed from, or moved to, the package itself
@@ -41,7 +51,7 @@ def section_contains(sections, section_name, text):
 
 def test_collate():
     nb = nbcollate(assignment_nb, student_notebooks, clear_outputs=True)
-    # nbformat.write(nb, open('output.ipynb', 'w'))
+    maybe_write_notebook(nb, 'output.ipynb')
 
     assert nb.metadata
     assert nb.metadata == assignment_nb.metadata
@@ -70,10 +80,19 @@ def test_collate():
     assert not section_contains(sections, "A Quick Poll", 'Student 3 answers the quick poll')
 
 
+def test_collate_with_names():
+    nb = nbcollate(assignment_nb, student_notebooks, clear_outputs=True, include_usernames=True)
+    maybe_write_notebook(nb, 'named.ipynb')
+
+    # TODO
+    # preserves order of responses
+    # assert (next(i for i, c in enumerate(sections["Question 1"]) if 'Student 1 answers question 1' in c.source) <
+    #         next(i for i, c in enumerate(sections["Question 1"]) if 'Student 2 answers question 1' in c.source))
+
+
 def test_report_missing_answers():
     nbe = NotebookExtractor(assignment_nb, student_notebooks)
     answer_status = dict(nbe.report_missing_answers())
-    # assert not answer_status
 
     assert set(answer_status.keys()) == {'1. Question 1', '2. Question 2'}
     assert answer_status['1. Question 1']['student-1'] == 'answered'

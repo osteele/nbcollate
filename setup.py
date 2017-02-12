@@ -20,11 +20,11 @@ setup(name='nbcollate',
       install_requires=[
           'cached_property',
           'nbconvert',
+          'nbformat',
           'numpy',
           'python-Levenshtein',
       ],
       tests_require=[
-          'nbformat',
           'pytest',
       ],
       )

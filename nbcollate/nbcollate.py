@@ -16,6 +16,7 @@ from collections import OrderedDict
 from copy import deepcopy
 
 import Levenshtein
+import nbformat
 from cached_property import cached_property
 from numpy import argmin
 
@@ -48,20 +49,17 @@ def nb_clear_outputs(nb):
             cell['outputs'] = []
 
 
-def nbcollate(assignment_nb, student_notebooks, clear_outputs=False):
+def nbcollate(assignment_nb, student_notebooks, **kwargs):
     """Create a notebook based on assignment_nb, that incorporates answers from student_notebooks."""
     nbe = NotebookExtractor(assignment_nb, student_notebooks)
-    return nbe.get_collated_notebook(clear_outputs)
+    return nbe.get_collated_notebook(**kwargs)
 
 
 # The extractor
 #
 
 class NotebookExtractor(object):
-    """The top-level class for extracting answers from a notebook.
-
-    TODO: add support multiple notebooks
-    """
+    """The top-level class for extracting answers from a notebook."""
 
     MATCH_THRESH = 10  # maximum edit distance to consider something a match
 
@@ -108,11 +106,9 @@ class NotebookExtractor(object):
 
     def _process(self):
         """Filter the notebook at the notebook_URL so that it only contains the questions and answers to the reading."""
-        nbs = dict(zip(self.usernames, self.notebooks))
-
         for prompt in self.question_prompts:
             prompt.answer_status = {}
-            for gh_username, notebook_content in nbs.items():
+            for username, notebook_content in zip(self.usernames, self.notebooks):
                 if notebook_content is None:
                     continue
                 suppress_non_answer = bool(prompt.answers)
@@ -133,8 +129,8 @@ class NotebookExtractor(object):
                         prompt.cells = [cell for cell in response_cells
                                         if cell.metadata.get('is_question', False)]
                         response_cells = [cell for cell in response_cells if cell not in prompt.cells]
-                    prompt.answers[gh_username] = response_cells
-                prompt.answer_status[gh_username] = status
+                    prompt.answers[username] = response_cells
+                prompt.answer_status[username] = status
 
         self._processed = True
 
@@ -155,10 +151,10 @@ class NotebookExtractor(object):
         for prompt in self.question_prompts:
             filtered_cells += prompt.cells
             answers = prompt.answers_without_duplicates if remove_duplicate_answers else prompt.answers
-            for gh_username, response_cells in answers.items():
+            for username, response_cells in answers.items():
                 if include_usernames:
                     filtered_cells.append(
-                        NotebookUtils.markdown_heading_cell(self.gh_username_to_fullname(gh_username), 4))
+                        NotebookUtils.markdown_heading_cell(username, 4))
                 filtered_cells.extend(response_cells)
 
         collated_nb = deepcopy(self.template)
@@ -267,11 +263,11 @@ class NotebookUtils(object):
 
         E.g. mark_down_heading_cell('Notebook Title','#')
         """
-        return {
-            'cell_type': 'markdown',
-            'metadata': {},
-            'source': '#' * heading_level + ' ' + text
-        }
+        return nbformat.from_dict(dict(
+            cell_type='markdown',
+            metadata={},
+            source='#' * heading_level + ' ' + text
+        ))
 
     @staticmethod
     def cell_list_text(cells):
