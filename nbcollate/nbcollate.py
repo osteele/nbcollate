@@ -118,7 +118,7 @@ class NotebookExtractor(object):
                                              suppress_non_answer)
                 if not response_cells:
                     status = 'missed'
-                elif not response_cells[-1].source or not NotebookUtils.cell_list_text(response_cells):
+                elif not response_cells[-1].source or not any(cell.source.strip() for cell in response_cells):
                     status = 'blank'
                 else:
                     status = 'answered'
@@ -154,7 +154,7 @@ class NotebookExtractor(object):
             for username, response_cells in answers.items():
                 if include_usernames:
                     filtered_cells.append(
-                        NotebookUtils.markdown_heading_cell(username, 4))
+                        create_markdown_heading_cell(username, 4))
                 filtered_cells.extend(response_cells)
 
         collated_nb = deepcopy(self.template)
@@ -249,26 +249,20 @@ class QuestionPrompt(object):
                 return return_value
             end_offset = argmin(distances)
         if len(self.question_heading) != 0 and not suppress_non_answer_cells:
-            return_value.append(NotebookUtils.markdown_heading_cell(self.question_heading, 2))
+            return_value.append(create_markdown_heading_cell(self.question_heading, 2))
         if not suppress_non_answer_cells:
             return_value.append(cells[best_match])
         return_value.extend(cells[best_match + 1:best_match + end_offset])
         return return_value
 
 
-class NotebookUtils(object):
-    @staticmethod
-    def markdown_heading_cell(text, heading_level):
-        """Create a Markdown cell with the specified text at the specified heading_level.
+def create_markdown_heading_cell(text, heading_level):
+    """Create a Markdown cell with the specified text at the specified heading_level.
 
-        E.g. mark_down_heading_cell('Notebook Title','#')
-        """
-        return nbformat.from_dict(dict(
-            cell_type='markdown',
-            metadata={},
-            source='#' * heading_level + ' ' + text
-        ))
-
-    @staticmethod
-    def cell_list_text(cells):
-        return ''.join(cell.source for cell in cells).strip()
+    E.g. mark_down_heading_cell('Notebook Title','#')
+    """
+    return nbformat.from_dict(dict(
+        cell_type='markdown',
+        metadata={},
+        source='#' * heading_level + ' ' + text
+    ))
