@@ -1,1 +1,1 @@
-from nbcollate import *
+from .nbcollate import *

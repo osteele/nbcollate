@@ -1,4 +1,5 @@
-"""
+"""Collate an assignment and answer Jupyter notebooks into a single notebook.
+
 This script is designed to support active reading.  It takes as input
 a set of ipython notebook as well as some target cells which define a set
 of reading exercises.  The script processes the collection of notebooks
@@ -8,7 +9,6 @@ Original work by Paul Ruvolo.
 Adapted by Oliver Steele
 """
 
-# TODO backport to olin-computing/classroom-tools, and include via submodule or package
 # TODO adding and parsing the cell metadata is messy. It dates from when the nb author supplied this
 
 import re
@@ -16,14 +16,13 @@ from collections import OrderedDict
 from copy import deepcopy
 
 import Levenshtein
-import nbformat
 from cached_property import cached_property
 from numpy import argmin
 
 # Constants
 #
 
-QUESTION_RE = r'#+ Exercise'
+QUESTION_RE = r'#+ (Exercise|Question)'
 POLL_RE = r'#+ .*(poll|Notes for the Instructors|Reading Journal Feedback)'
 CLEAR_OUTPUTS = True
 
@@ -31,9 +30,8 @@ CLEAR_OUTPUTS = True
 # Functions
 #
 
-def nb_add_metadata(nb, owner=None):
-    if owner:
-        nb['metadata']['owner'] = owner
+def nb_add_metadata(nb):
+    """Add metadata to a notebook."""
     for cell in nb['cells']:
         if cell['cell_type'] == 'markdown' and cell['source']:
             if re.match(QUESTION_RE, cell['source'], re.IGNORECASE):
@@ -41,24 +39,18 @@ def nb_add_metadata(nb, owner=None):
             elif re.match(POLL_RE, cell['source'], re.IGNORECASE):
                 cell['metadata']['is_question'] = True
                 cell['metadata']['is_poll'] = True
-    return nb
 
 
-def safe_read_notebook(string, owner=None, clear_outputs=False):
-    try:
-        nb = nbformat.reads(string, as_version=4)
-    except nbformat.reader.NotJSONError:
-        return None
-    nb = nb_add_metadata(nb, owner)
-    if clear_outputs:
-        for cell in nb['cells']:
-            if 'outputs' in cell:
-                cell['outputs'] = []
-    return nb
+def nb_clear_output(nb):
+    """Clear the output cells from a Jupyter notebook."""
+    for cell in nb['cells']:
+        if 'outputs' in cell:
+            cell['outputs'] = []
 
 
-def nb_combine(template_notebook, student_notebooks):
-    nbe = NotebookExtractor(template_notebook, student_notebooks)
+def nbcollate(assignment_nb, student_notebooks):
+    """Create a notebook based on assignment_nb, that incorporates answers from student_notebooks."""
+    nbe = NotebookExtractor(assignment_nb, student_notebooks)
     return nbe.get_combined_notebook()
 
 
@@ -75,10 +67,11 @@ class NotebookExtractor(object):
 
     def __init__(self, notebook_template, notebooks):
         """Initialize with the specified notebook URLs and list of question prompts."""
-        self.template = nb_add_metadata(notebook_template)
+        self.template = notebook_template
         self.notebooks = notebooks.values()
         self.usernames = notebooks.keys()
         self._processed = False
+        nb_add_metadata(notebook_template)
 
     @cached_property
     def question_prompts(self):
@@ -173,6 +166,9 @@ class NotebookExtractor(object):
         return answer_book
 
     def report_missing_answers(self):
+        """Return a list of [(question_name, {student_name: answer_status})].
+
+        answer_status is one of."""
         if not self._processed:
             self._process()
 
