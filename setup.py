@@ -23,4 +23,8 @@ setup(name='nbcollate',
           'numpy',
           'python-Levenshtein',
       ],
-      zip_safe=False)
+      tests_require=[
+          'nbformat',
+          'pytest',
+      ],
+      )
