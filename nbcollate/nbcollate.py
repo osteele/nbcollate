@@ -41,17 +41,17 @@ def nb_add_metadata(nb):
                 cell.metadata['is_poll'] = True
 
 
-def nb_clear_output(nb):
+def nb_clear_outputs(nb):
     """Clear the output cells from a Jupyter notebook."""
     for cell in nb.cells:
         if 'outputs' in cell:
             cell['outputs'] = []
 
 
-def nbcollate(assignment_nb, student_notebooks):
+def nbcollate(assignment_nb, student_notebooks, clear_outputs=False):
     """Create a notebook based on assignment_nb, that incorporates answers from student_notebooks."""
     nbe = NotebookExtractor(assignment_nb, student_notebooks)
-    return nbe.get_combined_notebook()
+    return nbe.get_collated_notebook(clear_outputs)
 
 
 # The extractor
@@ -146,7 +146,7 @@ class NotebookExtractor(object):
         #     for prompt in self.question_prompts:
         #         prompt.answers = OrderedDict(sorted(prompt.answers.items(), key=lambda t: cell_slines_length(t[1])))
 
-    def get_combined_notebook(self, include_usernames=False):
+    def get_collated_notebook(self, clear_outputs=False, include_usernames=False):
         if not self._processed:
             self._process()
 
@@ -161,14 +161,18 @@ class NotebookExtractor(object):
                         NotebookUtils.markdown_heading_cell(self.gh_username_to_fullname(gh_username), 4))
                 filtered_cells.extend(response_cells)
 
-        answer_book = deepcopy(self.template)
-        answer_book.cells = filtered_cells
-        return answer_book
+        collated_nb = deepcopy(self.template)
+        collated_nb.cells = filtered_cells
+        if clear_outputs:
+            collated_nb.cells = deepcopy(collated_nb.cells)
+            nb_clear_outputs(collated_nb)
+        return collated_nb
 
     def report_missing_answers(self):
         """Return a list of [(question_name, {student_name: answer_status})].
 
-        answer_status is one of."""
+        answer_status is one of 'missed', 'blank', or 'answered'.
+        """
         if not self._processed:
             self._process()
 

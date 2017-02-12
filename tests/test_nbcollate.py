@@ -11,8 +11,7 @@ from nbcollate import NotebookExtractor, nb_add_metadata, nbcollate
 def notebook(path):
     if not path.endswith('.ipynb'):
         path += '.ipynb'
-    nb = nbformat.read(os.path.join(os.path.dirname(
-        __file__), 'files', path), as_version=4)
+    nb = nbformat.read(os.path.join(os.path.dirname(__file__), 'files', path), as_version=4)
     nb_add_metadata(nb)
     return nb
 
@@ -41,7 +40,7 @@ def section_contains(sections, section_name, text):
 
 
 def test_collate():
-    nb = nbcollate(assignment_nb, student_notebooks)
+    nb = nbcollate(assignment_nb, student_notebooks, clear_outputs=True)
     # nbformat.write(nb, open('output.ipynb', 'w'))
 
     assert nb.metadata
