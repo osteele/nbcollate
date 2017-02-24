@@ -108,12 +108,10 @@ class NotebookExtractor(object):
         """Filter the notebook at the notebook_URL so that it only contains the questions and answers to the reading."""
         for prompt in self.question_prompts:
             prompt.answer_status = {}
-            for username, notebook_content in zip(self.usernames, self.notebooks):
-                if notebook_content is None:
-                    continue
+            for username, notebook in zip(self.usernames, self.notebooks):
                 suppress_non_answer = bool(prompt.answers)
                 response_cells = \
-                    prompt.get_closest_match(notebook_content.cells,
+                    prompt.get_closest_match(notebook.cells,
                                              NotebookExtractor.MATCH_THRESH,
                                              suppress_non_answer)
                 if not response_cells:
@@ -167,12 +165,13 @@ class NotebookExtractor(object):
     def report_missing_answers(self):
         """Return a list of [(question_name, {student_name: answer_status})].
 
-        answer_status is one of 'missed', 'blank', or 'answered'.
+        answer_status is in {'missed', 'blank', 'answered'}.
         """
         if not self._processed:
             self._process()
 
-        return [(prompt.name, prompt.answer_status) for prompt in self.question_prompts
+        return [(prompt.name, prompt.answer_status)
+                for prompt in self.question_prompts
                 if not prompt.is_poll and not prompt.is_optional]
 
 
@@ -197,6 +196,12 @@ class QuestionPrompt(object):
         self.index = index
         self.answers = OrderedDict()
         self.cells = []
+
+    def __str__(self):
+        title = self.start_md
+        if title.startswith('#'):
+            title = re.match('#+\s*(.*)', title).group(1)
+        return title
 
     @property
     def answers_without_duplicates(self):
@@ -229,16 +234,16 @@ class QuestionPrompt(object):
                           suppress_non_answer_cells=False):
         """Return a list of cells that most closely match the question prompt.
 
-        If no match is better than the matching_threshold, the empty list will be returned.
+        If no match is better than matching_threshold return the empty list.
         """
-        return_value = []
+        match = []
         distances = [Levenshtein.distance(self.start_md, cell.source)
                      for cell in cells]
         if min(distances) > matching_threshold:
-            return return_value
+            return match
 
         best_match = argmin(distances)
-        if self.stop_md == u"next_cell":
+        if self.stop_md == 'next_cell':
             end_offset = 2
         elif len(self.stop_md) == 0:
             end_offset = len(cells) - best_match
@@ -246,14 +251,15 @@ class QuestionPrompt(object):
             distances = [Levenshtein.distance(self.stop_md, cell.source)
                          for cell in cells[best_match:]]
             if min(distances) > matching_threshold:
-                return return_value
+                return match
             end_offset = argmin(distances)
+
         if len(self.question_heading) != 0 and not suppress_non_answer_cells:
-            return_value.append(create_markdown_heading_cell(self.question_heading, 2))
+            match.append(create_markdown_heading_cell(self.question_heading, 2))
         if not suppress_non_answer_cells:
-            return_value.append(cells[best_match])
-        return_value.extend(cells[best_match + 1:best_match + end_offset])
-        return return_value
+            match.append(cells[best_match])
+        match.extend(cells[best_match + 1:best_match + end_offset])
+        return match
 
 
 def create_markdown_heading_cell(text, heading_level):
