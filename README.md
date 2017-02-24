@@ -21,6 +21,16 @@ Remaining work includes:
 
 A web application with similar functionality is at [osteele/assignment-dashboard](https://github.com/osteele/assignment-dashboard). That application caches the state of GitHub into a local sqlite3 store, and provides a web interface for inspect completion status by student or by question and for browsing the original and collated notebooks. That application will eventually be modified to use this package.
 
+## Contributing
+
+Test via any of:
+
+    py.test
+    python setup.py test
+
+    docker build -t nbcollate-pytest .
+    docker run --rm -it -v `pwd`:/src nbcollate-pytest
+
 ## Contributions
 
 This package is derived from original work [paulruvolo/SoftDesSp16Prep](https://github.com/paulruvolo/SoftDesSp16Prep)
