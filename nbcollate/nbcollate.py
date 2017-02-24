@@ -51,14 +51,14 @@ def nb_clear_outputs(nb):
 
 def nbcollate(assignment_nb, student_notebooks, **kwargs):
     """Create a notebook based on assignment_nb, that incorporates answers from student_notebooks."""
-    nbe = NotebookExtractor(assignment_nb, student_notebooks)
+    nbe = NotebookCollator(assignment_nb, student_notebooks)
     return nbe.get_collated_notebook(**kwargs)
 
 
 # The extractor
 #
 
-class NotebookExtractor(object):
+class NotebookCollator(object):
     """The top-level class for extracting answers from a notebook."""
 
     MATCH_THRESH = 10  # maximum edit distance to consider something a match
@@ -112,7 +112,7 @@ class NotebookExtractor(object):
                 suppress_non_answer = bool(prompt.answers)
                 response_cells = \
                     prompt.get_closest_match(notebook.cells,
-                                             NotebookExtractor.MATCH_THRESH,
+                                             NotebookCollator.MATCH_THRESH,
                                              suppress_non_answer)
                 if not response_cells:
                     status = 'missed'

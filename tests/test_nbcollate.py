@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 from helpers import maybe_write_notebook, nb_sections, read_notebook, section_contains_string
-from nbcollate import NotebookExtractor, nbcollate
+from nbcollate import NotebookCollator, nbcollate
 
 assignment_nb = read_notebook('assignment')
 student_notebooks = OrderedDict((student_name, read_notebook(student_name))
@@ -46,7 +46,7 @@ def test_collate_with_names():
 
 
 def test_report_missing_answers():
-    nbe = NotebookExtractor(assignment_nb, student_notebooks)
+    nbe = NotebookCollator(assignment_nb, student_notebooks)
     answer_status = dict(nbe.report_missing_answers())
 
     assert set(answer_status.keys()) == {'1. Question 1', '2. Question 2'}

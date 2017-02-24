@@ -2,7 +2,7 @@
 from setuptools import setup
 
 setup(name='nbcollate',
-      version='0.1',
+      version='0.1.1',
       description='Collating Jupyter Notebooks',
       long_description='Collate Jupyter assignment notebooks',
       classifiers=[
