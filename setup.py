@@ -1,8 +1,16 @@
 # noqa: D100
+import os
+import re
+
 from setuptools import setup
 
+PKG_VERSION = re.search(r'^__version__\s*=\s*[\'"](.+?)[\'"]',
+                        open(os.path.join(os.path.dirname(__file__),
+                                          'nbcollate/version.py')).read(),
+                        re.M).group(1)
+
 setup(name='nbcollate',
-      version='0.1.1',
+      version=PKG_VERSION,
       description='Collating Jupyter Notebooks',
       long_description='Collate Jupyter assignment notebooks',
       classifiers=[
