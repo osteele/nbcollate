@@ -16,7 +16,7 @@ from collections import OrderedDict
 from copy import deepcopy
 
 import Levenshtein
-import nbformat
+import nbformat as nbf
 from cached_property import cached_property
 from numpy import argmin
 
@@ -152,10 +152,11 @@ class NotebookCollator(object):
             for username, response_cells in answers.items():
                 if include_usernames:
                     filtered_cells.append(
-                        create_markdown_heading_cell(username, 4))
+                        new_markdown_heading_cell(username, 4))
                 filtered_cells.extend(response_cells)
 
-        collated_nb = deepcopy(self.template)
+        collated_nb = nbf.v4.new_notebook()
+        collated_nb.metadata = self.template.metadata
         collated_nb.cells = filtered_cells
         if clear_outputs:
             collated_nb.cells = deepcopy(collated_nb.cells)
@@ -197,11 +198,16 @@ class QuestionPrompt(object):
         self.answers = OrderedDict()
         self.cells = []
 
-    def __str__(self):
+    @property
+    def title(self):
         title = self.start_md
         if title.startswith('#'):
             title = re.match('#+\s*(.*)', title).group(1)
         return title
+
+    def __str__(self):
+        """Return string for use in str(self)."""
+        return self.title
 
     @property
     def answers_without_duplicates(self):
@@ -255,20 +261,16 @@ class QuestionPrompt(object):
             end_offset = argmin(distances)
 
         if len(self.question_heading) != 0 and not suppress_non_answer_cells:
-            match.append(create_markdown_heading_cell(self.question_heading, 2))
+            match.append(new_markdown_heading_cell(self.question_heading, 2))
         if not suppress_non_answer_cells:
             match.append(cells[best_match])
         match.extend(cells[best_match + 1:best_match + end_offset])
         return match
 
 
-def create_markdown_heading_cell(text, heading_level):
+def new_markdown_heading_cell(text, heading_level):
     """Create a Markdown cell with the specified text at the specified heading_level.
 
     E.g. mark_down_heading_cell('Notebook Title','#')
     """
-    return nbformat.from_dict(dict(
-        cell_type='markdown',
-        metadata={},
-        source='#' * heading_level + ' ' + text
-    ))
+    return nbf.v4.new_markdown_cell('#' * heading_level + ' ' + text)
