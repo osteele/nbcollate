@@ -27,9 +27,9 @@ QUESTION_RE = r'#+ (Exercise|Question)'
 POLL_RE = r'#+ .*(poll|Notes for the Instructors|Reading Journal Feedback)'
 CLEAR_OUTPUTS = True
 
-
 # Functions
 #
+
 
 def nb_add_metadata(nb):
     """Add metadata to a notebook."""
@@ -57,6 +57,7 @@ def nbcollate(assignment_nb, student_notebooks, **kwargs):
 
 # The extractor
 #
+
 
 class NotebookCollator(object):
     """The top-level class for extracting answers from a notebook."""
@@ -86,15 +87,18 @@ class NotebookCollator(object):
                 cell_source = cell.source
                 if prev_prompt is not None:
                     prompts[-1].stop_md = cell_source
-                is_poll = metadata.get('is_poll', 'Reading Journal feedback' in cell_source.split('\n')[0])
-                prompts.append(QuestionPrompt(question_heading='',
-                                              name=metadata.get('problem', None),
-                                              index=len(prompts),
-                                              start_md=cell_source,
-                                              stop_md='next_cell',
-                                              is_optional=metadata.get('is_optional', None),
-                                              is_poll=is_poll
-                                              ))
+                is_poll = metadata.get(
+                    'is_poll',
+                    'Reading Journal feedback' in cell_source.split('\n')[0])
+                prompts.append(
+                    QuestionPrompt(
+                        question_heading='',
+                        name=metadata.get('problem', None),
+                        index=len(prompts),
+                        start_md=cell_source,
+                        stop_md='next_cell',
+                        is_optional=metadata.get('is_optional', None),
+                        is_poll=is_poll))
                 if metadata.get('allow_multi_cell', False):
                     prev_prompt = prompts[-1]
                     # if it's the last cell, take everything else
@@ -116,7 +120,8 @@ class NotebookCollator(object):
                                              suppress_non_answer)
                 if not response_cells:
                     status = 'missed'
-                elif not response_cells[-1].source or not any(cell.source.strip() for cell in response_cells):
+                elif not response_cells[-1].source or not any(
+                        cell.source.strip() for cell in response_cells):
                     status = 'blank'
                 else:
                     status = 'answered'
@@ -124,9 +129,14 @@ class NotebookCollator(object):
                         # If it's the first notebook with this answer, extract the questions from it.
                         # This is kind of a bass-ackwards way to do this; it's incremental from the previous
                         # strategy.
-                        prompt.cells = [cell for cell in response_cells
-                                        if cell.metadata.get('is_question', False)]
-                        response_cells = [cell for cell in response_cells if cell not in prompt.cells]
+                        prompt.cells = [
+                            cell for cell in response_cells
+                            if cell.metadata.get('is_question', False)
+                        ]
+                        response_cells = [
+                            cell for cell in response_cells
+                            if cell not in prompt.cells
+                        ]
                     prompt.answers[username] = response_cells
                 prompt.answer_status[username] = status
 
@@ -140,7 +150,9 @@ class NotebookCollator(object):
         #     for prompt in self.question_prompts:
         #         prompt.answers = OrderedDict(sorted(prompt.answers.items(), key=lambda t: cell_slines_length(t[1])))
 
-    def get_collated_notebook(self, clear_outputs=False, include_usernames=False):
+    def get_collated_notebook(self,
+                              clear_outputs=False,
+                              include_usernames=False):
         if not self._processed:
             self._process()
 
@@ -177,7 +189,14 @@ class NotebookCollator(object):
 
 
 class QuestionPrompt(object):
-    def __init__(self, question_heading, start_md, stop_md, name=None, index=None, is_poll=False, is_optional=None):
+    def __init__(self,
+                 question_heading,
+                 start_md,
+                 stop_md,
+                 name=None,
+                 index=None,
+                 is_poll=False,
+                 is_optional=None):
         """Initialize a question prompt.
 
         Initialize a question prompt with the specified starting markdown (the question), and stopping
@@ -187,7 +206,8 @@ class QuestionPrompt(object):
         To omit the question heading, specify the empty string.
         """
         if is_optional is None and start_md:
-            is_optional = bool(re.search(r'optional', start_md.split('\n')[0], re.I))
+            is_optional = bool(
+                re.search(r'optional', start_md.split('\n')[0], re.I))
         self.question_heading = question_heading
         self._name = name
         self.start_md = start_md
@@ -212,9 +232,11 @@ class QuestionPrompt(object):
     @property
     def answers_without_duplicates(self):
         answers = dict(self.answers)
-        answer_strings = set()  # answers to this question, as strings; used to avoid duplicates
+        answer_strings = set(
+        )  # answers to this question, as strings; used to avoid duplicates
         for username, response_cells in self.answers.items():
-            answer_string = '\n'.join(cell.source for cell in response_cells).strip()
+            answer_string = '\n'.join(cell.source
+                                      for cell in response_cells).strip()
             if answer_string in answer_strings:
                 del answers[username]
             else:
@@ -232,7 +254,8 @@ class QuestionPrompt(object):
             (True, False): '{number}',
             (True, True): '{number}. {title}'
         }[isinstance(self.index, int), bool(m)]
-        return format_str.format(number=(self.index or 0) + 1, title=m and m.group(1))
+        return format_str.format(
+            number=(self.index or 0) + 1, title=m and m.group(1))
 
     def get_closest_match(self,
                           cells,
@@ -243,8 +266,9 @@ class QuestionPrompt(object):
         If no match is better than matching_threshold return the empty list.
         """
         match = []
-        distances = [Levenshtein.distance(self.start_md, cell.source)
-                     for cell in cells]
+        distances = [
+            Levenshtein.distance(self.start_md, cell.source) for cell in cells
+        ]
         if min(distances) > matching_threshold:
             return match
 
@@ -254,8 +278,10 @@ class QuestionPrompt(object):
         elif len(self.stop_md) == 0:
             end_offset = len(cells) - best_match
         else:
-            distances = [Levenshtein.distance(self.stop_md, cell.source)
-                         for cell in cells[best_match:]]
+            distances = [
+                Levenshtein.distance(self.stop_md, cell.source)
+                for cell in cells[best_match:]
+            ]
             if min(distances) > matching_threshold:
                 return match
             end_offset = argmin(distances)
