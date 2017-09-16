@@ -1,8 +1,6 @@
 # nbcollate
-### Jupyter notebook collation
 
 The **nbcollate** package combines a set of Jupyter notebooks into a single notebook.
-
 
 ## Status
 
@@ -16,7 +14,6 @@ Remaining work includes:
 - [ ] option to concatenate notebooks
 - [ ] parameterize prompt recognition
 
-
 ## Related Projects
 
 [classroom-tools](https://github.com/olin-computing/classroom-tools) contains scripts related to using GitHub and Jupyter in education
@@ -27,17 +24,15 @@ A web application with similar functionality is at [olin-computing/assignment-da
 That application caches the state of GitHub in a local database, and provides a web interface for inspect completion status by student or by question,
 and for browsing the original and collated notebooks.
 
-
 ## Contributing
 
 Test via any of:
 
-    py.test
+    PYTHONPATH=. py.test
     python setup.py test
 
     docker build -t nbcollate-pytest .
     docker run --rm -it -v `pwd`:/src nbcollate-pytest
-
 
 ## Acknowledgements
 
