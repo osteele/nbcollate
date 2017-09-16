@@ -1,6 +1,9 @@
 # nbcollate
 
 [![Build Status](https://travis-ci.org/olin-computing/nbcollate.svg?branch=master)](https://travis-ci.org/olin-computing/nbcollate)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f60ffc2534ef45c6acc267dae760b373)](https://www.codacy.com/app/steele/nbcollate?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=olin-computing/nbcollate&amp;utm_campaign=Badge_Grade)
+[![Requirements Status](https://requires.io/github/olin-computing/nbcollate/requirements.svg?branch=master)](https://requires.io/github/olin-computing/nbcollate/requirements/?branch=master)
+[![Updates](https://pyup.io/repos/github/olin-computing/nbcollate/shield.svg)](https://pyup.io/repos/github/olin-computing/nbcollate/)
 
 The **nbcollate** package combines a set of Jupyter notebooks into a single notebook.
 
