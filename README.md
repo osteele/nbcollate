@@ -1,5 +1,6 @@
 # nbcollate
 
+[![Build Status](https://travis-ci.org/olin-computing/nbcollate.svg?branch=master)](https://travis-ci.org/olin-computing/nbcollate)
 
 The **nbcollate** package combines a set of Jupyter notebooks into a single notebook.
 
