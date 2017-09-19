@@ -9,10 +9,11 @@ Original work by Paul Ruvolo.
 Adapted by Oliver Steele
 """
 
-# TODO adding and parsing the cell metadata is messy. It dates from when the nb author supplied this
+# TODO adding and parsing the cell metadata is messy. It dates from when
+# the nb author supplied this
 
 import re
-from collections import OrderedDict
+from collections import Iterable, OrderedDict
 from copy import deepcopy
 
 import Levenshtein
@@ -49,14 +50,25 @@ def nb_clear_outputs(nb):
             cell['outputs'] = []
 
 
-def nbcollate(assignment_nb, student_notebooks, **kwargs):
-    """Create a notebook based on assignment_nb, that incorporates answers from student_notebooks."""
-    nbe = NotebookCollator(assignment_nb, student_notebooks)
+def nbcollate(assignment_nb, student_nbs, **kwargs):
+    """Create a notebook based on assignment_nb, that incorporates answers from student_nbs.
+
+    Args:
+        assignment_nb: a Jupyter notebook with the assignment
+        student_nbs: a dict or iterable whose values are notebooks with answers
+
+    Returns:
+        A Jupyter notebook
+    """
+    if isinstance(student_nbs, Iterable) and not isinstance(student_nbs, dict):
+        student_nbs = dict(enumerate(student_nbs))
+    nbe = NotebookCollator(assignment_nb, student_nbs)
     return nbe.get_collated_notebook(**kwargs)
 
 
 # The extractor
 #
+from typing import Dict
 
 
 class NotebookCollator(object):
@@ -189,6 +201,7 @@ class NotebookCollator(object):
 
 
 class QuestionPrompt(object):
+
     def __init__(self,
                  question_heading,
                  start_md,
