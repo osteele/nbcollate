@@ -1,6 +1,7 @@
 # noqa: D100
 import os
 import re
+from glob import glob
 
 from setuptools import setup
 
@@ -12,6 +13,7 @@ PKG_VERSION = re.search(
 setup(
     name='nbcollate',
     version=PKG_VERSION,
+    scripts=glob(os.path.join('scripts', '*')),
     description='Collating Jupyter Notebooks',
     long_description='Collate Jupyter assignment notebooks',
     classifiers=[
@@ -36,4 +38,5 @@ setup(
     ],
     tests_require=[
         'pytest',
-    ], )
+    ]
+)
