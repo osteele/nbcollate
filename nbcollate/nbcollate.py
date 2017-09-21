@@ -15,6 +15,7 @@ Adapted by Oliver Steele
 import re
 from collections import Iterable, OrderedDict
 from copy import deepcopy
+import logging
 
 import Levenshtein
 import nbformat as nbf
@@ -24,9 +25,16 @@ from numpy import argmin
 # Constants
 #
 
-QUESTION_RE = r'#+ (Exercise|Question)'
+# QUESTION_RE = r'#+ (Exercise|Question)'
+QUESTION_RE = r'#+ '
 POLL_RE = r'#+ .*(poll|Notes for the Instructors|Reading Journal Feedback)'
 CLEAR_OUTPUTS = True
+
+# Logging
+#
+
+logger = logging.getLogger(__name__)
+
 
 # Functions
 #
@@ -118,6 +126,7 @@ class NotebookCollator(object):
                         prompts[-1].stop_md = ''
                 else:
                     prev_prompt = None
+        logger.info('prompts = %s', prompts)
         return prompts
 
     def _process(self):
@@ -160,7 +169,8 @@ class NotebookCollator(object):
         #     def cell_slines_length(response_cells):
         #         return len('\n'.join(cell['source') for cell in response_cells).strip())
         #     for prompt in self.question_prompts:
-        #         prompt.answers = OrderedDict(sorted(prompt.answers.items(), key=lambda t: cell_slines_length(t[1])))
+        # prompt.answers = OrderedDict(sorted(prompt.answers.items(),
+        # key=lambda t: cell_slines_length(t[1])))
 
     def get_collated_notebook(self,
                               clear_outputs=False,
@@ -201,6 +211,7 @@ class NotebookCollator(object):
 
 
 class QuestionPrompt(object):
+    """A QuestionPrompt represents a prompt within an assignment."""
 
     def __init__(self,
                  question_heading,
@@ -237,6 +248,10 @@ class QuestionPrompt(object):
         if title.startswith('#'):
             title = re.match('#+\s*(.*)', title).group(1)
         return title
+
+    def __repr__(self):
+        """Return string for use in repr(self)."""
+        return "<class {} {!r}>".format(self.__class__.__name__, self.title)
 
     def __str__(self):
         """Return string for use in str(self)."""
@@ -307,9 +322,9 @@ class QuestionPrompt(object):
         return match
 
 
-def new_markdown_heading_cell(text, heading_level):
-    """Create a Markdown cell with the specified text at the specified heading_level.
+def new_markdown_heading_cell(title, level):
+    """Create a Markdown cell with the specified text at the specified heading level.
 
-    E.g. mark_down_heading_cell('Notebook Title','#')
+    E.g. mark_down_heading_cell('Title', 3) -> '### Title'
     """
-    return nbf.v4.new_markdown_cell('#' * heading_level + ' ' + text)
+    return nbf.v4.new_markdown_cell('{:#<{}} {}'.format('', level, title))
