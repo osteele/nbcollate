@@ -23,6 +23,7 @@ def main():
         logging.basicConfig(format='%(message)s', level=logging.INFO)
     nbs = [nbformat.read(nbf, as_version=4) for nbf in args.notebook_files]
     anb = nbs[0]
+    nb_add_metadata(anb)
     snbs = nbs[1:]
     nb = nbcollate(nbs[0], snbs)
     suffix = "-combined"
