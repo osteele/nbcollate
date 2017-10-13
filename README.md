@@ -1,11 +1,14 @@
 # nbcollate
 
-[![Build Status](https://travis-ci.org/olin-computing/nbcollate.svg?branch=master)](https://travis-ci.org/olin-computing/nbcollate)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f60ffc2534ef45c6acc267dae760b373)](https://www.codacy.com/app/steele/nbcollate?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=olin-computing/nbcollate&amp;utm_campaign=Badge_Grade)
-[![Requirements Status](https://requires.io/github/olin-computing/nbcollate/requirements.svg?branch=master)](https://requires.io/github/olin-computing/nbcollate/requirements/?branch=master)
-[![Updates](https://pyup.io/repos/github/olin-computing/nbcollate/shield.svg)](https://pyup.io/repos/github/olin-computing/nbcollate/)
+[![Build Status][travis-svg]][travis-url]
+[![Codacy Badge][codacy-svg]][codacy-url]
+[![Requirements Status][requires-svg]][requires-url]
+[![Updates][pyup-svg]][pyup-url]
+ [![][license-svg]][license-url]
 
 The **nbcollate** package combines a set of Jupyter notebooks into a single notebook.
+
+It also provides a command-line interface. Execute `nbcollate --help` for usage information.
 
 ## Status
 
@@ -15,7 +18,6 @@ Remaining work includes:
 
 - [ ] the current algorithm misses response cells
 - [ ] documentation and testing
-- [ ] add a command-line interface
 - [ ] option to concatenate notebooks
 - [ ] parameterize prompt recognition
 
@@ -44,3 +46,18 @@ Test via any of:
 This package is derived from original work [paulruvolo/SoftDesSp16Prep](https://github.com/paulruvolo/SoftDesSp16Prep)
 by Paul Ruvolo at Olin College,
 extended at [osteele/assignment-tools](https://github.com/osteele/assignment-tools).
+
+[codacy-svg]: https://api.codacy.com/project/badge/Grade/f60ffc2534ef45c6acc267dae760b373
+[codacy-url]: https://www.codacy.com/app/steele/nbcollate?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=olin-computing/nbcollate&amp;utm_campaign=Badge_Grade
+
+[travis-svg]: https://travis-ci.org/olin-computing/nbcollate.svg?branch=master
+[travis-url]: https://travis-ci.org/olin-computing/nbcollate
+
+[license-url]: https://github.com/osteele/gojekyll/blob/master/LICENSE
+[license-svg]: https://img.shields.io/badge/license-MIT-blue.svg
+
+[pyup-svg]: https://pyup.io/repos/github/olin-computing/nbcollate/shield.svg
+[pyup-url]: https://pyup.io/repos/github/olin-computing/nbcollate/
+
+[requires-svg]: https://requires.io/github/olin-computing/nbcollate/requirements.svg?branch=master
+[requires-url ]: https://requires.io/github/olin-computing/nbcollate/requirements/?branch=master

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-"""nbcollate combines a set of Jupyter notebooks into a single notebook.
-
-Command-line interface for nbcollate.
+"""Create a combined notebook. The first path is the assignment notebook.
+Remaining paths are student notebooks.
 """
 
 import argparse
@@ -59,7 +58,7 @@ def collate(master_nb_path, student_nb_paths, args):
 
 def main():
     """Create a collated notebook."""
-    parser = argparse.ArgumentParser(description="Create a combined notebook.")
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-f', '--force', type=str,
                         help="Force overwrite existing file")
     parser.add_argument('-n', '--dry-run', help="Dry run")
