@@ -10,24 +10,67 @@ import os
 import sys
 
 import nbformat
+import nbformat.reader
 from . import nbcollate, nb_add_metadata
 
-Parser = argparse.ArgumentParser(description="Create a combined notebook.")
-Parser.add_argument('-v', '--verbose', action='store_true')
-Parser.add_argument('notebook_files', nargs='+', metavar='NOTEBOOK_FILE')
+
+def safe_read(nbf):
+    """A wrapper from nbformat.read, that prints a warning and returns None on
+    bad notebooks.
+    """
+    try:
+        return nbformat.read(nbf, as_version=4)
+    except nbformat.reader.NotJSONError:
+        print('while reading', nbf)
+
+
+def collate(master_nb_path, student_nb_paths, args):
+    """Collate notebooks.
+
+    Arguments
+    ---------
+    nb_files: [str]
+        A list of notebook file pathnames.
+    """
+    if args.verbose:
+        logging.basicConfig(format='%(message)s', level=logging.INFO)
+    student_nbs = [safe_read(nbf) for nbf in student_nb_paths]
+    student_nbs = [collated_nb for collated_nb in student_nbs if collated_nb]
+    master_nb = safe_read(master_nb_path)
+    assert master_nb
+    nb_add_metadata(master_nb)
+    collated_nb = nbcollate(master_nb, student_nbs)
+    suffix = "-combined"
+    root, ext = os.path.splitext(args.notebook_files[0])
+    collated_nb_path = "{}{}{}".format(root, suffix, ext)
+    if args.out:
+        collated_nb_path = os.path.join(
+            args.out, os.path.split(collated_nb_path)[1])
+    if not args.force and os.path.exists(collated_nb_path):
+        # FIXME raise condition; instead open w/ os.O_CREAT | os.O_WRONLY
+        err = FileExistsError()
+        err.filename = collated_nb_path
+        raise err
+    if not args.dry_run:
+        with open(collated_nb_path, 'w') as fp:
+            nbformat.write(collated_nb, fp)
+    print('wrote', collated_nb_path)
 
 
 def main():
-    args = Parser.parse_args(sys.argv[1:])
-    if args.verbose:
-        logging.basicConfig(format='%(message)s', level=logging.INFO)
-    nbs = [nbformat.read(nbf, as_version=4) for nbf in args.notebook_files]
-    anb = nbs[0]
-    nb_add_metadata(anb)
-    snbs = nbs[1:]
-    nb = nbcollate(nbs[0], snbs)
-    suffix = "-combined"
-    root, ext = os.path.splitext(args.notebook_files[0])
-    out = "{}{}{}".format(root, suffix, ext)
-    with open(out, 'w') as fp:
-        nbformat.write(nb, fp)
+    """Create a collated notebook."""
+    parser = argparse.ArgumentParser(description="Create a combined notebook.")
+    parser.add_argument('-f', '--force', type=str,
+                        help="Force overwrite existing file")
+    parser.add_argument('-n', '--dry-run', help="Dry run")
+    parser.add_argument('-o', '--out', type=str, help="Output directory")
+    parser.add_argument('-v', '--verbose', action='store_true')
+    parser.add_argument('notebook_files', nargs='+', metavar='NOTEBOOK_FILE')
+    args = parser.parse_args(sys.argv[1:])
+    nb_files = args.notebook_files
+    try:
+        collate(nb_files[0], nb_files[1:], args)
+    except FileExistsError as e:
+        sys.stderr.write(
+            "Output file already exists. Repeat with --force to replace it.\n")
+        sys.exit(1)
