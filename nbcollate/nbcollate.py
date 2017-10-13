@@ -25,8 +25,8 @@ from numpy import argmin
 # Constants
 #
 
-# QUESTION_RE = r'#+ (Exercise|Question)'
-QUESTION_RE = r'#+ '
+QUESTION_RE = r'#+ (Exercise|Question)'
+# QUESTION_RE = r'#+ '
 POLL_RE = r'#+ .*(poll|Notes for the Instructors|Reading Journal Feedback)'
 CLEAR_OUTPUTS = True
 
