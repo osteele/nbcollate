@@ -19,7 +19,8 @@ setup(
     classifiers=[
         'Intended Audience :: Developers', 'Intended Audience :: Education',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python', 'Programming Language :: Python :: 3'
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5'
     ],
     url='http://github.com/olin-computing/nbcollate',
