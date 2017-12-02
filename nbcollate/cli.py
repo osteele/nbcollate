@@ -10,6 +10,7 @@ import sys
 
 import nbformat
 import nbformat.reader
+import nbcollate as nbc
 from . import nbcollate, nb_add_metadata
 
 
@@ -56,17 +57,26 @@ def collate(master_nb_path, student_nb_paths, args):
     print('wrote', collated_nb_path)
 
 
-def main():
+def main(args=sys.argv[1:]):
     """Create a collated notebook."""
     parser = argparse.ArgumentParser(description=__doc__)
+    nb_nargs = '*' if '--version' in args else '+'
     parser.add_argument('-f', '--force', type=str,
                         help="Force overwrite existing file")
     parser.add_argument('-n', '--dry-run', help="Dry run")
     parser.add_argument('-o', '--out', type=str, help="Output directory")
     parser.add_argument('-v', '--verbose', action='store_true')
-    parser.add_argument('notebook_files', nargs='+', metavar='NOTEBOOK_FILE')
-    args = parser.parse_args(sys.argv[1:])
+    parser.add_argument('--version', action='store_true')
+    parser.add_argument('notebook_files', nargs=nb_nargs,
+                        metavar='NOTEBOOK_FILE')
+    args = parser.parse_args(args)
+    if args.version:
+        print('nbcollate version', nbc.__version__)
+        return
     nb_files = args.notebook_files
+    if not nb_files:
+        parser.error(
+            'the following arguments are required: NOTEBOOK_FILE')
     try:
         collate(nb_files[0], nb_files[1:], args)
     except FileExistsError as e:
