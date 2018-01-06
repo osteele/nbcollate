@@ -29,6 +29,7 @@ def maybe_write_notebook(nb, basename):
 
 
 class NotebookSection(namedtuple('_NotebookSection', 'title children cells')):
+
     def __str_lines__(self):
         prefix = '  '
         return itertools.chain(['Section: ' + self.title], (
