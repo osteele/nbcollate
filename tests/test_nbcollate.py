@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 from helpers import maybe_write_notebook, nb_sections, read_notebook, section_contains_string
-from nbcollate import NotebookCollator, nbcollate
+from nbcollate import nbcollate, get_answer_tuples
 
 assignment_nb = read_notebook('assignment')
 student_notebooks = OrderedDict(
@@ -46,28 +46,26 @@ def test_collate_without_names():
 
 
 def test_collate_with_names():
-    nb = nbcollate(
-        assignment_nb,
-        student_notebooks,
-        clear_outputs=True,
-        include_usernames=True)
+    nb = nbcollate(assignment_nb, student_notebooks, clear_outputs=True)
     maybe_write_notebook(nb, 'named.ipynb')
 
     # TODO
     # preserves order of responses
     # assert (next(i for i, c in enumerate(sections["Question 1"]) if 'Student 1 answers question 1' in c.source) <
-    #         next(i for i, c in enumerate(sections["Question 1"]) if 'Student 2 answers question 1' in c.source))
+    # next(i for i, c in enumerate(sections["Question 1"]) if 'Student 2
+    # answers question 1' in c.source))
 
 
 def test_report_missing_answers():
-    nbe = NotebookCollator(assignment_nb, student_notebooks)
-    answer_status = dict(nbe.report_missing_answers())
+    answers = get_answer_tuples(nbcollate(assignment_nb, student_notebooks))
 
-    assert set(answer_status.keys()) == {'1. Question 1', '2. Question 2'}
-    assert answer_status['1. Question 1']['student-1'] == 'answered'
-    assert answer_status['1. Question 1']['student-2'] == 'answered'
-    assert answer_status['1. Question 1']['student-3'] == 'answered'
+    assert {title for title, _ in answers} == {'A Quick Poll', 'Question 1', 'Question 2'}
+    assert {student for _, student in answers} == {'student-1', 'student-2', 'student-3'}
 
-    assert answer_status['2. Question 2']['student-1'] == 'answered'
-    assert answer_status['2. Question 2']['student-2'] == 'blank'
-    assert answer_status['2. Question 2']['student-3'] == 'answered'
+    assert ('Question 1', 'student-1') in answers
+    assert ('Question 1', 'student-2') in answers
+    assert ('Question 1', 'student-3') in answers
+
+    assert ('Question 2', 'student-1') in answers
+    assert ('Question 2', 'student-2') not in answers
+    assert ('Question 2', 'student-3') in answers

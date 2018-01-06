@@ -11,7 +11,7 @@ import sys
 import nbformat
 import nbformat.reader
 import nbcollate as nbc
-from . import nbcollate, nb_add_metadata
+from . import nbcollate
 
 
 def safe_read(nbf):
@@ -38,7 +38,6 @@ def collate(master_nb_path, student_nb_paths, args):
     student_nbs = [collated_nb for collated_nb in student_nbs if collated_nb]
     master_nb = safe_read(master_nb_path)
     assert master_nb
-    nb_add_metadata(master_nb)
     collated_nb = nbcollate(master_nb, student_nbs)
     suffix = "-combined"
     root, ext = os.path.splitext(args.notebook_files[0])

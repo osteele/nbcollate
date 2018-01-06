@@ -5,8 +5,6 @@ from collections import OrderedDict, namedtuple
 
 import nbformat
 
-from nbcollate import nb_add_metadata
-
 
 def read_notebook(basename):
     """"Read notebook `basename` from the test files directory."""
@@ -15,7 +13,6 @@ def read_notebook(basename):
     nb = nbformat.read(
         os.path.join(os.path.dirname(__file__), 'files', basename),
         as_version=4)
-    nb_add_metadata(nb)
     return nb
 
 

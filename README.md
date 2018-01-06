@@ -43,7 +43,7 @@ Test via any of:
 
 ## Acknowledgements
 
-This package is derived from original work [paulruvolo/SoftDesSp16Prep](https://github.com/paulruvolo/SoftDesSp16Prep)
+This package is inspired by original work [paulruvolo/SoftDesSp16Prep](https://github.com/paulruvolo/SoftDesSp16Prep)
 by Paul Ruvolo at Olin College,
 extended at [osteele/assignment-tools](https://github.com/osteele/assignment-tools).
 
