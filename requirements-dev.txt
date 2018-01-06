@@ -1,5 +1,4 @@
 -r requirements.txt
 
-mypy~=0.52
 pytest~=3.2.2
-twine~=1.9.1
+flit~=0.13
