@@ -1,7 +1,7 @@
 nbcollate
 =========
 
-|PyPI version| |Build Status| |Codacy Badge| |Requirements Status| |Updates| |License|
+|PyPI version| |Build Status| |Updates| |License|
 
 The **nbcollate** package combines a set of Jupyter notebooks into a
 single notebook.
@@ -87,12 +87,6 @@ by Paul Ruvolo at Olin College, extended at
 .. |Build Status| image:: https://travis-ci.org/osteele/nbcollate.svg?branch=master
    :target: https://travis-ci.org/osteele/nbcollate
    :alt: Build Status
-.. |Codacy Badge| image:: https://api.codacy.com/project/badge/Grade/f60ffc2534ef45c6acc267dae760b373
-   :target: https://www.codacy.com/app/steele/nbcollate?utm_source=github.com&utm_medium=referral&utm_content=osteele/nbcollate&utm_campaign=Badge_Grade
-   :alt: Codacy
-.. |Requirements Status| image:: https://requires.io/github/osteele/nbcollate/requirements.svg?branch=master
-   :target: https://requires.io/github/osteele/nbcollate/requirements/?branch=master
-   :alt: Requirements Status
 .. |Updates| image:: https://pyup.io/repos/github/osteele/nbcollate/shield.svg
    :target: https://pyup.io/repos/github/osteele/nbcollate/
    :alt: Updates
