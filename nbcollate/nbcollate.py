@@ -29,7 +29,7 @@ def nb_clear_outputs(nb):
             cell['outputs'] = []
 
 
-def nbcollate(assignment_nb, submission_nbs, *, ids=None, names=None, clear_outputs=False):
+def nbcollate(assignment_nb, submission_nbs, *, ids=None, labels=None, clear_outputs=False):
     """Create a notebook based on assignment_nb, that incorporates answers from student_nbs.
 
     Args:
@@ -59,8 +59,8 @@ def nbcollate(assignment_nb, submission_nbs, *, ids=None, names=None, clear_outp
             if ids:
                 for c in b_cells:
                     c.metadata.nbcollate_source = ids[i]
-            if names:
-                b_cells = [label_cell(names[i])] + b_cells
+            if labels:
+                b_cells = [label_cell(labels[i])] + b_cells
             output_cells[i0:i0] = b_cells
             di += len(b_cells)
     nb = assignment_nb.copy()

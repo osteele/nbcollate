@@ -24,21 +24,31 @@ def safe_read(nbf):
         print('while reading', nbf)
 
 
-def collate(master_nb_path, student_nb_paths, args):
+def capitalize(s):
+    return s[:1].upper() + s[1:]
+
+
+def collate(master_nb_path, submission_paths, args):
     """Collate notebooks.
 
     Arguments
     ---------
-    nb_files: [str]
+    master_nb_path: str
+        The master notebook.
+    submission_paths: [str]
         A list of notebook file pathnames.
     """
     if args.verbose:
         logging.basicConfig(format='%(message)s', level=logging.INFO)
-    student_nbs = [safe_read(nbf) for nbf in student_nb_paths]
-    student_nbs = [collated_nb for collated_nb in student_nbs if collated_nb]
+    submission_nbs = [safe_read(nbf) for nbf in submission_paths]
+    submission_nbs = [collated_nb for collated_nb in submission_nbs if collated_nb]
     master_nb = safe_read(master_nb_path)
     assert master_nb
-    collated_nb = nbcollate(master_nb, student_nbs)
+    labels = None
+    if args.label:
+        labels = [capitalize(os.path.splitext(os.path.split(f)[1])[0].replace('-', ' '))
+                  for f in submission_paths]
+    collated_nb = nbcollate(master_nb, submission_nbs, labels=labels)
     suffix = "-collated"
     root, ext = os.path.splitext(args.notebook_files[0])
     collated_nb_path = "{}{}{}".format(root, suffix, ext)
@@ -51,8 +61,8 @@ def collate(master_nb_path, student_nb_paths, args):
         err.filename = collated_nb_path
         raise err
     if not args.dry_run:
-        with open(collated_nb_path, 'w') as fp:
-            nbformat.write(collated_nb, fp)
+        with open(collated_nb_path, 'w') as f:
+            nbformat.write(collated_nb, f)
     print('wrote', collated_nb_path)
 
 
@@ -60,10 +70,11 @@ def main(args=sys.argv[1:]):
     "Create a collated notebook."
     parser = argparse.ArgumentParser(description=__doc__)
     nb_nargs = '*' if '--version' in args else '+'
-    parser.add_argument('-f', '--force', type=str, help="Force overwrite existing file")
+    parser.add_argument('-f', '--force', action='store_true', help="Force overwrite existing file")
     parser.add_argument('-n', '--dry-run', help="Dry run")
     parser.add_argument('-o', '--out', type=str, help="Output directory")
     parser.add_argument('-v', '--verbose', action='store_true')
+    parser.add_argument('--label', action='store_true', help="Label answers by notebook")
     parser.add_argument('--version', action='store_true')
     parser.add_argument('notebook_files', nargs=nb_nargs, metavar='NOTEBOOK_FILE')
     args = parser.parse_args(args)
@@ -72,13 +83,13 @@ def main(args=sys.argv[1:]):
         return
     if not args.notebook_files:
         parser.error('the following arguments are required: NOTEBOOK_FILE')
-    master_file, *answer_files = args.notebook_files
+    master_file, *submission_files = args.notebook_files
     # Remove the master file from the answer files. This allows the CLI
     # to be used in the pattern `nbcollate master.ipynb *.ipynb`.
-    if master_file in answer_files:
-        answer_files = [f for f in answer_files if f != master_file]
+    if master_file in submission_files:
+        submission_files = [f for f in submission_files if f != master_file]
     try:
-        collate(master_file, answer_files, args)
+        collate(master_file, submission_files, args)
     except FileExistsError:
         sys.stderr.write("Output file already exists. Repeat with --force to replace it.\n")
         sys.exit(1)
