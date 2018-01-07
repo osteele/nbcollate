@@ -54,8 +54,8 @@ def assert_golden(nb, basename, clear_outputs=False):
 
 
 def test_nbcollate_without_labels():
-    # nb = nbcollate(ASSIGNMENT_NB, SUBMISSION_NBS.values(), clear_outputs=True)
-    # assert_golden(nb, 'assignment-collated.ipynb', clear_outputs=True)
+    nb = nbcollate(ASSIGNMENT_NB, SUBMISSION_NBS.values(), clear_outputs=True)
+    assert_golden(nb, 'assignment-collated.ipynb', clear_outputs=True)
 
     nb = nbcollate(ASSIGNMENT_NB, SUBMISSION_NBS.values(), clear_outputs=False)
     assert_golden(nb, 'assignment-collated.ipynb', clear_outputs=False)
