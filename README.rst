@@ -6,20 +6,39 @@ nbcollate
 The **nbcollate** package combines a set of Jupyter notebooks into a
 single notebook.
 
-It also provides a command-line interface. Execute ``nbcollate --help``
-for usage information.
+It also provides a command-line interface, ``nbcollate``.
 
-Status
-------
+Example
+-------
 
-This package is in an alpha state. The API may change.
+::
 
-Remaining work includes:
+    nbcollate assignment.ipynb student-*.ipynb
 
--  [ ] the current algorithm misses response cells
--  [ ] documentation and testing
--  [ ] option to concatenate notebooks
--  [ ] parameterize prompt recognition
+Creates the file |collated|_ from the files in |example-dir|_.
+
+.. |collated| replace:: assignment-collated.ipynb
+.. _collated: https://pypi.python.org/pypi/nbcollate
+.. |example-dir| replace:: test/files
+.. _example-dir: https://github.com/osteele/nbcollate/tree/master/tests/files
+
+Installation
+------------
+
+::
+
+    pip install nbcollate
+
+Usage
+-----
+
+::
+
+    nbcollate assignment-1.ipynb students/*/assignment-1.ipynb
+
+::
+
+    nbcollate --help
 
 Related Projects
 ----------------
