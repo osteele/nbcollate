@@ -57,6 +57,12 @@ question, and for browsing the original and collated notebooks.
 Contributing
 ------------
 
+Set up tools:
+
+::
+
+    pip install -r requirements-dev.txt
+
 Test via any of:
 
 ::
