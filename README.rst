@@ -1,7 +1,7 @@
 nbcollate
 =========
 
-|Build Status| |Codacy Badge| |Requirements Status| |Updates| |image4|
+|PyPI version| |Build Status| |Codacy Badge| |Requirements Status| |Updates| |License|
 
 The **nbcollate** package combines a set of Jupyter notebooks into a
 single notebook.
@@ -56,13 +56,21 @@ This package is inspired by original work
 by Paul Ruvolo at Olin College, extended at
 `osteele/assignment-tools <https://github.com/osteele/assignment-tools>`__.
 
-.. |Build Status| image:: https://travis-ci.org/olin-computing/nbcollate.svg?branch=master
-   :target: https://travis-ci.org/olin-computing/nbcollate
+.. |PyPI version| image:: https://img.shields.io/pypi/v/nbcollate.svg
+   :target: https://pypi.python.org/pypi/nbcollate
+   :alt: Latest PyPI Version
+.. |Build Status| image:: https://travis-ci.org/osteele/nbcollate.svg?branch=master
+   :target: https://travis-ci.org/osteele/nbcollate
+   :alt: Build Status
 .. |Codacy Badge| image:: https://api.codacy.com/project/badge/Grade/f60ffc2534ef45c6acc267dae760b373
-   :target: https://www.codacy.com/app/steele/nbcollate?utm_source=github.com&utm_medium=referral&utm_content=olin-computing/nbcollate&utm_campaign=Badge_Grade
-.. |Requirements Status| image:: https://requires.io/github/olin-computing/nbcollate/requirements.svg?branch=master
-   :target: https://requires.io/github/olin-computing/nbcollate/requirements/?branch=master
-.. |Updates| image:: https://pyup.io/repos/github/olin-computing/nbcollate/shield.svg
-   :target: https://pyup.io/repos/github/olin-computing/nbcollate/
-.. |image4| image:: https://img.shields.io/badge/license-MIT-blue.svg
-   :target: https://github.com/osteele/gojekyll/blob/master/LICENSE
+   :target: https://www.codacy.com/app/steele/nbcollate?utm_source=github.com&utm_medium=referral&utm_content=osteele/nbcollate&utm_campaign=Badge_Grade
+   :alt: Codacy
+.. |Requirements Status| image:: https://requires.io/github/osteele/nbcollate/requirements.svg?branch=master
+   :target: https://requires.io/github/osteele/nbcollate/requirements/?branch=master
+   :alt: Requirements Status
+.. |Updates| image:: https://pyup.io/repos/github/osteele/nbcollate/shield.svg
+   :target: https://pyup.io/repos/github/osteele/nbcollate/
+   :alt: Updates
+.. |License| image:: https://img.shields.io/badge/license-MIT-blue.svg
+   :target: https://github.com/osteele/nbcollate/blob/master/LICENSE
+   :alt: License
