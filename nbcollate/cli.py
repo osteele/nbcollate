@@ -15,7 +15,7 @@ from . import nbcollate
 
 
 def safe_read(nbf):
-    """A wrapper from nbformat.read, that prints a warning and returns None on
+    """A wrapper for nbformat.read, that prints a warning and returns None on
     bad notebooks.
     """
     try:
@@ -39,7 +39,7 @@ def collate(master_nb_path, student_nb_paths, args):
     master_nb = safe_read(master_nb_path)
     assert master_nb
     collated_nb = nbcollate(master_nb, student_nbs)
-    suffix = "-combined"
+    suffix = "-collated"
     root, ext = os.path.splitext(args.notebook_files[0])
     collated_nb_path = "{}{}{}".format(root, suffix, ext)
     if args.out:
@@ -57,7 +57,7 @@ def collate(master_nb_path, student_nb_paths, args):
 
 
 def main(args=sys.argv[1:]):
-    """Create a collated notebook."""
+    "Create a collated notebook."
     parser = argparse.ArgumentParser(description=__doc__)
     nb_nargs = '*' if '--version' in args else '+'
     parser.add_argument('-f', '--force', type=str, help="Force overwrite existing file")
