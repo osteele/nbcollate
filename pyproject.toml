@@ -6,6 +6,7 @@ build-backend = "flit.buildapi"
 module = "nbcollate"
 author = "Oliver Steele"
 author-email = "steele@osteele.com"
+description-file = "./README.rst"
 home-page = "https://github.com/osteele/nbcollate"
 classifiers = [
     "Development Status :: 3 - Alpha",
