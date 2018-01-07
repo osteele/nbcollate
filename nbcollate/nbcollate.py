@@ -23,7 +23,7 @@ import nbformat
 
 
 def nb_clear_outputs(nb):
-    """Clear the output cells from a Jupyter notebook."""
+    "Clear the output cells from a Jupyter notebook."
     for cell in nb.cells:
         if 'outputs' in cell:
             cell['outputs'] = []
@@ -34,7 +34,7 @@ def nbcollate(assignment_nb, submission_nbs, *, ids=None, labels=None, clear_out
 
     Args:
         assignment_nb: a Jupyter notebook with the assignment
-        student_nbs: a dict or iterable whose values are notebooks with answers
+        submission_nbs: a dict or iterable whose values are notebooks with answers
 
     Returns:
         A Jupyter notebook
@@ -64,7 +64,7 @@ def nbcollate(assignment_nb, submission_nbs, *, ids=None, labels=None, clear_out
             output_cells[i0:i0] = b_cells
             di += len(b_cells)
     nb = assignment_nb.copy()
-    nb.cells = [c for c in output_cells if c.source.strip()]
+    nb.cells = [c.copy() for c in output_cells if c.source.strip()]
     if clear_outputs:
         nb_clear_outputs(nb)
     return nb
