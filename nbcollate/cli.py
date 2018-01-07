@@ -70,12 +70,15 @@ def main(args=sys.argv[1:]):
     if args.version:
         print('nbcollate version', nbc.__version__)
         return
-    nb_files = args.notebook_files
-    if not nb_files:
+    if not args.notebook_files:
         parser.error('the following arguments are required: NOTEBOOK_FILE')
+    master_file, *answer_files = args.notebook_files
+    # Remove the master file from the answer files. This allows the CLI
+    # to be used in the pattern `nbcollate master.ipynb *.ipynb`.
+    if master_file in answer_files:
+        answer_files = [f for f in answer_files if f != master_file]
     try:
-        collate(nb_files[0], nb_files[1:], args)
-    except FileExistsError as e:
-        sys.stderr.write(
-            "Output file already exists. Repeat with --force to replace it.\n")
+        collate(master_file, answer_files, args)
+    except FileExistsError:
+        sys.stderr.write("Output file already exists. Repeat with --force to replace it.\n")
         sys.exit(1)
