@@ -3,18 +3,18 @@ from collections import OrderedDict
 from helpers import maybe_write_notebook, nb_sections, read_notebook, section_contains_string
 from nbcollate import nbcollate, get_answer_tuples
 
-assignment_nb = read_notebook('assignment')
-student_notebooks = OrderedDict(
+ASSIGNMENT_NB = read_notebook('assignment')
+submission_nbs = OrderedDict(
     (student_name, read_notebook(student_name))
-    for student_name in ['student-1', 'student-2', 'student-3'])
+    for student_name in ['student-1', 'student-2', 'student-3', 'student-4'])
 
 
 def test_collate_without_names():
-    nb = nbcollate(assignment_nb, student_notebooks, clear_outputs=True)
+    nb = nbcollate(ASSIGNMENT_NB, submission_nbs, clear_outputs=True)
     maybe_write_notebook(nb, 'anonymous.ipynb')
 
     assert nb.metadata
-    assert nb.metadata == assignment_nb.metadata
+    assert nb.metadata == ASSIGNMENT_NB.metadata
 
     sections = nb_sections(nb)
 
@@ -26,7 +26,6 @@ def test_collate_without_names():
     # assert section_contains_string(sections, "Question 1", 'print("Student 2 answers question 1 with more code.")')
     assert section_contains_string(sections, "Question 1",
                                    'print("Student 3 answers question 1.")')
-    return
 
     assert "Question 2" in sections
     assert section_contains_string(sections, "Question 2",
@@ -46,7 +45,7 @@ def test_collate_without_names():
 
 
 def test_collate_with_names():
-    nb = nbcollate(assignment_nb, student_notebooks, clear_outputs=True)
+    nb = nbcollate(ASSIGNMENT_NB, submission_nbs, clear_outputs=True)
     maybe_write_notebook(nb, 'named.ipynb')
 
     # TODO
@@ -57,10 +56,9 @@ def test_collate_with_names():
 
 
 def test_report_missing_answers():
-    answers = get_answer_tuples(nbcollate(assignment_nb, student_notebooks))
-
+    answers = get_answer_tuples(nbcollate(ASSIGNMENT_NB, submission_nbs))
     assert {title for title, _ in answers} == {'A Quick Poll', 'Question 1', 'Question 2'}
-    assert {student for _, student in answers} == {'student-1', 'student-2', 'student-3'}
+    assert {student for _, student in answers} == {'student-1', 'student-2', 'student-3', 'student-4'}
 
     assert ('Question 1', 'student-1') in answers
     assert ('Question 1', 'student-2') in answers
