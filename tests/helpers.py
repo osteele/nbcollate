@@ -7,19 +7,17 @@ import nbformat
 
 
 def read_notebook(basename):
-    """"Read notebook `basename` from the test files directory."""
+    "Read notebook `basename` from the test files directory."
     if not basename.endswith('.ipynb'):
         basename += '.ipynb'
-    nb = nbformat.read(
+    return nbformat.read(
         os.path.join(os.path.dirname(__file__), 'files', basename),
         as_version=4)
-    return nb
 
 
 def maybe_write_notebook(nb, basename):
-    """If PYTEST_SAVE_OUTPUTS is set, save the notebook to test/build/{basename}.ipynb."""
-    if not os.environ.get('PYTEST_SAVE_OUTPUTS',
-                          False) not in {False, "0", "false"}:
+    "If PYTEST_SAVE_OUTPUTS is set, save the notebook to test/build/{basename}.ipynb."
+    if os.environ.get('PYTEST_SAVE_OUTPUTS', False) in {False, "0", "false"}:
         return
     if not basename.endswith('.ipynb'):
         basename += '.ipynb'

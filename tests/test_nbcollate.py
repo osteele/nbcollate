@@ -1,16 +1,17 @@
 from collections import OrderedDict
 
 from helpers import maybe_write_notebook, nb_sections, read_notebook, section_contains_string
-from nbcollate import nbcollate, get_answer_tuples
+from nbcollate import nbcollate, get_answer_tuples, nb_clear_outputs
+import nbcollate as nbc
 
 ASSIGNMENT_NB = read_notebook('assignment')
-submission_nbs = OrderedDict(
+SUBMISSION_NBS = OrderedDict(
     (student_name, read_notebook(student_name))
     for student_name in ['student-1', 'student-2', 'student-3', 'student-4'])
 
 
 def test_collate_without_names():
-    nb = nbcollate(ASSIGNMENT_NB, submission_nbs, clear_outputs=True)
+    nb = nbcollate(ASSIGNMENT_NB, SUBMISSION_NBS, clear_outputs=True)
     maybe_write_notebook(nb, 'anonymous.ipynb')
 
     assert nb.metadata
@@ -44,19 +45,38 @@ def test_collate_without_names():
                                        'Student 3 answers the quick poll')
 
 
-def test_collate_with_names():
-    nb = nbcollate(ASSIGNMENT_NB, submission_nbs, clear_outputs=True)
-    maybe_write_notebook(nb, 'named.ipynb')
+def assert_golden(nb, basename, clear_outputs=False):
+    gm = read_notebook(basename)
+    if clear_outputs:
+        nb_clear_outputs(gm)
+    maybe_write_notebook(nb, basename)
+    assert nb == gm
 
-    # TODO
-    # preserves order of responses
-    # assert (next(i for i, c in enumerate(sections["Question 1"]) if 'Student 1 answers question 1' in c.source) <
-    # next(i for i, c in enumerate(sections["Question 1"]) if 'Student 2
-    # answers question 1' in c.source))
+
+def test_nbcollate_without_labels():
+    # nb = nbcollate(ASSIGNMENT_NB, SUBMISSION_NBS.values(), clear_outputs=True)
+    # assert_golden(nb, 'assignment-collated.ipynb', clear_outputs=True)
+
+    nb = nbcollate(ASSIGNMENT_NB, SUBMISSION_NBS.values(), clear_outputs=False)
+    assert_golden(nb, 'assignment-collated.ipynb', clear_outputs=False)
+
+
+def test_nbcollate_sort():
+    submission_nbs = [read_notebook('sorted-%d.ipynb' % i) for i in [1, 2]]
+    nb = nbcollate(ASSIGNMENT_NB, submission_nbs, clear_outputs=True)
+    nbc.sort_answers(nb)
+    assert_golden(nb, 'sorted.ipynb', clear_outputs=True)
+
+
+def test_nbcollate_remove_dups():
+    submission_nbs = [read_notebook('dups-%d.ipynb' % i) for i in [1, 2]]
+    nb = nbcollate(ASSIGNMENT_NB, submission_nbs, clear_outputs=True)
+    nbc.remove_duplicate_answers(nb)
+    assert_golden(nb, 'deduped.ipynb', clear_outputs=True)
 
 
 def test_report_missing_answers():
-    answers = get_answer_tuples(nbcollate(ASSIGNMENT_NB, submission_nbs))
+    answers = get_answer_tuples(nbcollate(ASSIGNMENT_NB, SUBMISSION_NBS))
     assert {title for title, _ in answers} == {'A Quick Poll', 'Question 1', 'Question 2'}
     assert {student for _, student in answers} == {'student-1', 'student-2', 'student-3', 'student-4'}
 
