@@ -16,8 +16,6 @@ from difflib import SequenceMatcher
 from itertools import starmap
 
 import nbformat
-# from cached_property import cached_property
-# from numpy import argmin
 
 # QUESTION_RE = r'#+ (Exercise|Question)'
 
@@ -56,8 +54,10 @@ def nbcollate(assignment_nb, submission_nbs, *, ids=None, labels=None, clear_out
         op, i1, i2, j1, j2 = opcode
         if op in ('insert', 'replace'):
             i0 = i2 + di
+            b_cells = [c.copy() for c in b_cells]
             if ids:
                 for c in b_cells:
+                    c.metadata = c.metadata.copy()
                     c.metadata.nbcollate_source = ids[i]
             if labels:
                 b_cells = [label_cell(labels[i])] + b_cells
