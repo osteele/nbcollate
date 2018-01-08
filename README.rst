@@ -3,8 +3,8 @@ nbcollate
 
 |PyPI version| |Doc Status| |Build Status| |Updates| |License|
 
-The **nbcollate** package provides an API and a command-line interface to
-combine a set of Jupyter notebooks into a single notebook.
+This package provides an `API`_, and a command-line interface, to combine a set of
+Jupyter notebooks into a single notebook.
 
 The provided functions combine a Jupyter notebook that contains a set of
 prompts, and copies of this notebook that answer the prompts, into a single
@@ -117,3 +117,5 @@ MIT
 .. |License| image:: https://img.shields.io/badge/license-MIT-blue.svg
     :target: https://github.com/osteele/nbcollate/blob/master/LICENSE
     :alt: License
+
+.. _API: http://nbcollate.readthedocs.io/en/latest/?badge=latest#module-nbcollate
