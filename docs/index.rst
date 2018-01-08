@@ -12,5 +12,5 @@ API
 
 .. data:: Notebook
 
-   A Jupyter notebook, represented as :data:`nbformat.NotebookNode` from the
+   A Jupyter notebook, represented as :class:`nbformat.NotebookNode` from the
    nbformat package.
