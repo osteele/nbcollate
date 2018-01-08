@@ -3,24 +3,18 @@ nbcollate
 
 |PyPI version| |Build Status| |Updates| |License|
 
-The **nbcollate** package combines a set of Jupyter notebooks into a
-single notebook.
+The **nbcollate** package provides an API and a command-line interface to
+combine a set of Jupyter notebooks into a single notebook.
 
-It also provides a command-line interface, ``nbcollate``.
+The provided functions combine a Jupyter notebook that contains a set of
+prompts, and copies of this notebook that answer the prompts, into a single
+notebook that lists all the answers after each prompt.
 
-Example
--------
-
-::
-
-    nbcollate assignment.ipynb student-*.ipynb
-
-Creates the file |collated|_ from the files in |example-dir|_.
-
-.. |collated| replace:: assignment-collated.ipynb
-.. _collated: https://pypi.python.org/pypi/nbcollate
-.. |example-dir| replace:: test/files
-.. _example-dir: https://github.com/osteele/nbcollate/tree/master/tests/files
+This is intended for use in a classroom setting, to collect assignment
+submissions into a notebook that can be quickly reviewed. The notebook can
+include student names, or it can be anonymous for use in classroom review. In
+the latter case, functionality exists to remove duplicate answers, and to sort
+answers by length.
 
 Installation
 ------------
@@ -29,16 +23,57 @@ Installation
 
     pip install nbcollate
 
-Usage
------
+Command-Line Usage
+------------------
 
 ::
 
-    nbcollate assignment-1.ipynb students/*/assignment-1.ipynb
+    nbcollate assignment.ipynb student-*.ipynb
+
+Creates the file |collated|_ from the ``student-*`` files in |example-dir|_.
+
+::
+
+    nbcollate assignment.ipynb student-*.ipynb --label
+
+Same as above, but labels each student with a name derived from the notebook
+file name.
+
+.. |collated| replace:: assignment-collated.ipynb
+.. _collated: https://github.com/osteele/nbcollate/blob/master/tests/files/assignment-collated.ipynb
+.. |example-dir| replace:: test/files
+.. _example-dir: https://github.com/osteele/nbcollate/tree/master/tests/files
 
 ::
 
     nbcollate --help
+
+Contributing
+------------
+
+Set Up
+^^^^^^
+
+::
+
+    pip install -r requirements-dev.txt
+
+Test
+^^^^
+
+::
+
+    py.test
+
+Release
+^^^^^^^
+
+::
+
+    tox
+    bumpversion release
+    flit publish
+    git push
 
 Related Projects
 ----------------
@@ -54,25 +89,6 @@ That application caches the state of GitHub in a local database, and
 provides a web interface for inspect completion status by student or by
 question, and for browsing the original and collated notebooks.
 
-Contributing
-------------
-
-Set up tools:
-
-::
-
-    pip install -r requirements-dev.txt
-
-Test via any of:
-
-::
-
-    PYTHONPATH=. py.test
-    python setup.py test
-
-    docker build -t nbcollate-pytest .
-    docker run --rm -it -v `pwd`:/src nbcollate-pytest
-
 Acknowledgements
 ----------------
 
@@ -80,6 +96,11 @@ This package is inspired by original work
 `paulruvolo/SoftDesSp16Prep <https://github.com/paulruvolo/SoftDesSp16Prep>`__
 by Paul Ruvolo at Olin College, extended at
 `osteele/assignment-tools <https://github.com/osteele/assignment-tools>`__.
+
+License
+-------
+
+MIT
 
 .. |PyPI version| image:: https://img.shields.io/pypi/v/nbcollate.svg
    :target: https://pypi.python.org/pypi/nbcollate
