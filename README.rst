@@ -106,7 +106,7 @@ MIT
     :target: https://pypi.python.org/pypi/nbcollate
     :alt: Latest PyPI Version
 .. |Doc Status| image:: https://readthedocs.org/projects/nbcollate/badge/?version=latest
-    :target: http://callgraph.readthedocs.io/en/latest/?badge=latest
+    :target: http://nbcollate.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 .. |Build Status| image:: https://travis-ci.org/osteele/nbcollate.svg?branch=master
     :target: https://travis-ci.org/osteele/nbcollate
