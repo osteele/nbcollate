@@ -1,7 +1,7 @@
 nbcollate
 =========
 
-|PyPI version| |Build Status| |Updates| |License|
+|PyPI version| |Doc Status| |Build Status| |Updates| |License|
 
 The **nbcollate** package provides an API and a command-line interface to
 combine a set of Jupyter notebooks into a single notebook.
@@ -103,14 +103,17 @@ License
 MIT
 
 .. |PyPI version| image:: https://img.shields.io/pypi/v/nbcollate.svg
-   :target: https://pypi.python.org/pypi/nbcollate
-   :alt: Latest PyPI Version
+    :target: https://pypi.python.org/pypi/nbcollate
+    :alt: Latest PyPI Version
+.. |Doc Status| image:: https://readthedocs.org/projects/callgraph/badge/?version=latest
+    :target: http://callgraph.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 .. |Build Status| image:: https://travis-ci.org/osteele/nbcollate.svg?branch=master
-   :target: https://travis-ci.org/osteele/nbcollate
-   :alt: Build Status
+    :target: https://travis-ci.org/osteele/nbcollate
+    :alt: Build Status
 .. |Updates| image:: https://pyup.io/repos/github/osteele/nbcollate/shield.svg
-   :target: https://pyup.io/repos/github/osteele/nbcollate/
-   :alt: Updates
+    :target: https://pyup.io/repos/github/osteele/nbcollate/
+    :alt: Updates
 .. |License| image:: https://img.shields.io/badge/license-MIT-blue.svg
-   :target: https://github.com/osteele/nbcollate/blob/master/LICENSE
-   :alt: License
+    :target: https://github.com/osteele/nbcollate/blob/master/LICENSE
+    :alt: License

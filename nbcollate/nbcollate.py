@@ -21,7 +21,11 @@ import nbformat
 
 
 def nb_clear_outputs(nb):
-    "Clear the output cells from a Jupyter notebook."
+    """Clear the output cells in a Jupyter notebook.
+
+    Args:
+        nb: a Jupyter notebook
+    """
     for cell in nb.cells:
         if 'outputs' in cell:
             cell['outputs'] = []
@@ -30,12 +34,16 @@ def nb_clear_outputs(nb):
 def nbcollate(assignment_nb, submission_nbs, *, ids=None, labels=None, clear_outputs=False):
     """Create a notebook based on assignment_nb, that incorporates answers from student_nbs.
 
-    Args:
-        assignment_nb: a Jupyter notebook with the assignment
-        submission_nbs: a dict or iterable whose values are notebooks with answers
+    Arguments
+    ---------
+    assignment_nb: notebook
+        A Jupyter notebook with the assignment.
+    submission_nbs: notebook
+        A dict or iterable whose values are notebooks with answers.
 
-    Returns:
-        A Jupyter notebook
+    Returns
+    -------
+    notebook: A Jupyter notebook
     """
     if isinstance(submission_nbs, dict):
         assert not ids
@@ -78,23 +86,39 @@ def NotebookMatcher(nb1, nb2):
     return SequenceMatcher(None, cell_strings(nb1), cell_strings(nb2))
 
 
-def isections(nb):
-    section = (None, [])
+def i_sections(nb, *, header=None):
+    """Generate (title, [cell]) pairs.
+
+    Args:
+        nb(notebook): A Jupyter notebook. This is modified in place.
+
+    Yields:
+        (title, [cell]). Title is a string, or None if there are cells before
+        the first header.
+    """
+    matcher = re.compile(header or r'^##+\s*(.+)').match
+    cells = []
+    section = (None, cells)
     for cell in nb.cells:
-        m = re.match(r'^##+\s*(.+)', cell.source)
+        m = matcher(cell.source)
         if m:
             if section[-1]:
                 yield section
-            section = (m.group(1), [])
-        section[-1].append(cell)
-    if section[-1]:
+            cells = []
+            section = (m.group(1), cells)
+        cells.append(cell)
+    if cells:
         yield section
 
 
 def remove_duplicate_answers(nb):
-    "Modify a notebook to remove duplicate answers within each section."
+    """Modify a notebook to remove duplicate answers within each section.
+
+    Args:
+        nb: A Jupyter notebook. This is modified in place.
+    """
     dups = []
-    for _, cells in isections(nb):
+    for _, cells in i_sections(nb):
         seen = set()
         for c in cells:
             h = c.source.strip()
@@ -106,10 +130,14 @@ def remove_duplicate_answers(nb):
 
 
 def sort_answers(nb):
-    "Sort the answers within each section by length, and then alphabetically."
+    """Sort the answers within each section by length, and then alphabetically.
+
+    Args:
+        nb: A Jupyter notebook. This is modified in place.
+    """
     dups = []
     out = []
-    for _, cells in isections(nb):
+    for _, cells in i_sections(nb):
         out += sorted(cells, key=lambda c: (len(c.source.strip().splitlines()), c.source.strip()))
     nb.cells = out
 
@@ -119,7 +147,11 @@ def get_cell_source_id(cell):
 
 
 def get_answer_tuples(nb):
-    "Return a set of tuples (student_id, prompt_title) of answered prompts."
+    """Return a set of tuples (student_id, prompt_title) of answered prompts.
+
+    Args:
+        nb: a Jupyter notebook
+    """
     return {(title, get_cell_source_id(c))
-            for title, cells in isections(nb)
+            for title, cells in i_sections(nb)
             for c in cells if get_cell_source_id(c) is not None}
