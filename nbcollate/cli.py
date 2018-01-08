@@ -11,6 +11,7 @@ import sys
 import nbformat
 import nbformat.reader
 import nbcollate as nbc
+from minimalkeys import minimal_keys
 from . import nbcollate
 
 
@@ -25,7 +26,14 @@ def safe_read(nbf):
 
 
 def capitalize(s):
-    return s[:1].upper() + s[1:]
+    "Upcase the first character in a string s."
+    return s[:1].upper() + s[1:] if s else s
+
+
+def map_if_uniq(fn, seq):
+    "Return fn mapped across seq, if this doesn't conflate distinct items."
+    out = list(map(fn, seq))
+    return out if len(set(out)) == len(set(seq)) else seq
 
 
 def collate(master_nb_path, submission_paths, args):
@@ -46,8 +54,9 @@ def collate(master_nb_path, submission_paths, args):
     assert master_nb
     labels = None
     if args.label:
-        labels = [capitalize(os.path.splitext(os.path.split(f)[1])[0].replace('-', ' '))
-                  for f in submission_paths]
+        labels = minimal_keys(submission_paths, split=r'([\w-]+)')
+        labels = map_if_uniq(lambda s: s.replace('-', ' '), labels)
+        labels = map_if_uniq(capitalize, labels)
 
     collated_nb = nbcollate(master_nb, submission_nbs, labels=labels)
     if not args.label:
