@@ -92,6 +92,7 @@ def isections(nb):
 
 
 def remove_duplicate_answers(nb):
+    "Modify a notebook to remove duplicate answers within each section."
     dups = []
     for _, cells in isections(nb):
         seen = set()
@@ -105,10 +106,11 @@ def remove_duplicate_answers(nb):
 
 
 def sort_answers(nb):
+    "Sort the answers within each section by length, and then alphabetically."
     dups = []
     out = []
     for _, cells in isections(nb):
-        out += sorted(cells, key=lambda c: len(c.source.splitlines()))
+        out += sorted(cells, key=lambda c: (len(c.source.strip().splitlines()), c.source.strip()))
     nb.cells = out
 
 
