@@ -15,6 +15,7 @@ from difflib import SequenceMatcher
 from itertools import starmap
 
 # QUESTION_RE = r'#+ (Exercise|Question)'
+SOURCE_METADATA_KEY = 'nbcollate_source'
 
 
 def nb_clear_outputs(nb):
@@ -28,30 +29,40 @@ def nb_clear_outputs(nb):
             cell['outputs'] = []
 
 
-def nbcollate(assignment_nb, submission_nbs, *, ids=None, labels=None, clear_outputs=False):
-    """Create a notebook based on assignment_nb, that incorporates answers from submission_nbs.
+def nbcollate(assignment_nb, answer_nbs, *, ids=None, labels=None, clear_outputs=False):
+    """Create a notebook based on assignment_nb, that incorporates answers from answer_nbs.
 
     Arguments
     ---------
     assignment_nb: Notebook
         A Jupyter notebook with the assignment.
-    submission_nbs: Notebook
-        A dict or iterable whose values are notebooks with answers.
+    answer_nbs: object
+        A :class:`dict` or iterable whose values are notebooks with answers.
+        If this value is a :class:`dict`, its keys are ids and its values are
+        the corresponding notebooks.
+    labels: [str]
+        If non-empty, this should have the same length as ``answer_nbs``.
+        A header is placed before each run of cells from a notebook in
+        ``answer_nbs``.
+    ids: sequence
+        If non-empty, this should have the same length as ``answer_nbs``.
+        Each cell from an answer notebook has metadata ``nbcollate_source``
+        set to the element from ``ids``.
+    ids: bool
+        If true, cell output is cleared.
 
     Returns
     -------
         Notebook: A Jupyter notebook
     """
-    if isinstance(submission_nbs, dict):
+    if isinstance(answer_nbs, dict):
         assert not ids
-        ids = list(submission_nbs.keys())
-        submission_nbs = list(submission_nbs.values())
+        ids = list(answer_nbs.keys())
+        answer_nbs = list(answer_nbs.values())
 
-    def label_cell(s_name):
-        return nbformat.v4.new_markdown_cell(source='**{}**'.format(s_name))
     Opcode = namedtuple('opcode', ['op', 'i1', 'i2', 'j1', 'j2'])
     changes = sorted((oc.i2, i, oc, nb.cells[oc.j1:oc.j2])
-                     for i, nb in enumerate(submission_nbs)
+                     for i, nb in enumerate(answer_nbs)
                      for oc in starmap(Opcode, NotebookMatcher(assignment_nb, nb).get_opcodes()))
     output_cells = assignment_nb.cells[:]
     di = 0
@@ -63,9 +74,9 @@ def nbcollate(assignment_nb, submission_nbs, *, ids=None, labels=None, clear_out
             if ids:
                 for c in b_cells:
                     c.metadata = c.metadata.copy()
-                    c.metadata.nbcollate_source = ids[i]
+                    c.metadata[SOURCE_METADATA_KEY] = ids[i]
             if labels:
-                b_cells = [label_cell(labels[i])] + b_cells
+                b_cells = [make_label_cell(labels[i])] + b_cells
             output_cells[i0:i0] = b_cells
             di += len(b_cells)
     nb = assignment_nb.copy()
@@ -75,7 +86,13 @@ def nbcollate(assignment_nb, submission_nbs, *, ids=None, labels=None, clear_out
     return nb
 
 
+def make_label_cell(label):
+    "Create a cell that labels a collated notebook with ``label``."
+    return nbformat.v4.new_markdown_cell(source='**{}**'.format(label))
+
+
 def cell_strings(nb):
+    "Return a cell's normalized source, for comparison."
     return [cell.source.strip() for cell in nb.cells]
 
 
@@ -140,7 +157,8 @@ def sort_answers(nb):
 
 
 def get_cell_source_id(cell):
-    return getattr(cell.metadata, 'nbcollate_source', None)
+    "Return an answer notebook id that was placed in a cell by :func:`nbcollate`."
+    return getattr(cell.metadata, SOURCE_METADATA_KEY, None)
 
 
 def get_answer_tuples(nb):
