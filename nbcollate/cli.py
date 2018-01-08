@@ -48,7 +48,12 @@ def collate(master_nb_path, submission_paths, args):
     if args.label:
         labels = [capitalize(os.path.splitext(os.path.split(f)[1])[0].replace('-', ' '))
                   for f in submission_paths]
+
     collated_nb = nbcollate(master_nb, submission_nbs, labels=labels)
+    if not args.label:
+        nbc.remove_duplicate_answers(collated_nb)
+        # nbc.sort_answers(collated_nb)
+
     suffix = "-collated"
     root, ext = os.path.splitext(args.notebook_files[0])
     collated_nb_path = "{}{}{}".format(root, suffix, ext)
