@@ -10,12 +10,9 @@ Rewritten by Oliver Steele
 """
 
 import re
-# from collections import Iterable, OrderedDict
 from collections import namedtuple
 from difflib import SequenceMatcher
 from itertools import starmap
-
-import nbformat
 
 # QUESTION_RE = r'#+ (Exercise|Question)'
 
@@ -24,7 +21,7 @@ def nb_clear_outputs(nb):
     """Clear the output cells in a Jupyter notebook.
 
     Args:
-        nb: a Jupyter notebook
+        nb (Notebook): a Jupyter notebook
     """
     for cell in nb.cells:
         if 'outputs' in cell:
@@ -32,18 +29,18 @@ def nb_clear_outputs(nb):
 
 
 def nbcollate(assignment_nb, submission_nbs, *, ids=None, labels=None, clear_outputs=False):
-    """Create a notebook based on assignment_nb, that incorporates answers from student_nbs.
+    """Create a notebook based on assignment_nb, that incorporates answers from submission_nbs.
 
     Arguments
     ---------
-    assignment_nb: notebook
+    assignment_nb: Notebook
         A Jupyter notebook with the assignment.
-    submission_nbs: notebook
+    submission_nbs: Notebook
         A dict or iterable whose values are notebooks with answers.
 
     Returns
     -------
-    notebook: A Jupyter notebook
+        Notebook: A Jupyter notebook
     """
     if isinstance(submission_nbs, dict):
         assert not ids
@@ -90,7 +87,7 @@ def i_sections(nb, *, header=None):
     """Generate (title, [cell]) pairs.
 
     Args:
-        nb(notebook): A Jupyter notebook. This is modified in place.
+        nb (Notebook): A Jupyter notebook. This is modified in place.
 
     Yields:
         (title, [cell]). Title is a string, or None if there are cells before
@@ -115,7 +112,7 @@ def remove_duplicate_answers(nb):
     """Modify a notebook to remove duplicate answers within each section.
 
     Args:
-        nb: A Jupyter notebook. This is modified in place.
+        nb (Notebook): A Jupyter notebook. This is modified in place.
     """
     dups = []
     for _, cells in i_sections(nb):
@@ -133,7 +130,7 @@ def sort_answers(nb):
     """Sort the answers within each section by length, and then alphabetically.
 
     Args:
-        nb: A Jupyter notebook. This is modified in place.
+        nb (Notebook): A Jupyter notebook. This is modified in place.
     """
     dups = []
     out = []
@@ -150,7 +147,7 @@ def get_answer_tuples(nb):
     """Return a set of tuples (student_id, prompt_title) of answered prompts.
 
     Args:
-        nb: a Jupyter notebook
+        nb (Notebook): a Jupyter notebook
     """
     return {(title, get_cell_source_id(c))
             for title, cells in i_sections(nb)
