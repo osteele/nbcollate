@@ -24,5 +24,11 @@ requires = [
     "nbformat (~=4.4.0)",
     "minimalkeys (~=0.1.0)",
 ]
-dev-requires = ["pytest (~=3.2.2)"]
+dev-requires = [
+    "pytest (~=3.2.2)",
+    "keyring",
+    "Sphinx",
+    "bumpversion",
+    "sphinx_rtd_theme",
+]
 requires-python = ">=3.5"
