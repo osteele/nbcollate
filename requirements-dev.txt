@@ -1,7 +1,7 @@
 -r requirements.txt
 
 pytest~=3.2.2
-flit~=0.13
+flit==1.0
 keyring~=10.6.0
 Sphinx~=1.6.5
 bumpversion~=0.5.3
