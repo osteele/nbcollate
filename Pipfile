@@ -1,0 +1,24 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+name = "pypi"
+verify_ssl = true
+
+
+[dev-packages]
+
+pytest = "*"
+flit = "*"
+keyring = "*"
+Sphinx = "*"
+bumpversion = "*"
+sphinx_rtd_theme = "*"
+
+
+[packages]
+
+nbformat = "*"
+
+[requires]
+
+python_version = "3.6"

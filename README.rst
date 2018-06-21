@@ -54,16 +54,19 @@ Contributing
 Set Up
 ^^^^^^
 
+Install `pipenv <https://docs.pipenv.org/>`. Then:
+
 ::
 
-    pip install -r requirements-dev.txt
+    pipenv install
+    pipenv shell
 
 Test
 ^^^^
 
 ::
 
-    py.test
+    pytest
 
 Release
 ^^^^^^^
@@ -73,7 +76,7 @@ Release
     tox
     bumpversion release
     flit publish
-    git push
+    git push --tags
 
 Related Projects
 ----------------
