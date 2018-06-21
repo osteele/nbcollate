@@ -14,6 +14,8 @@ from collections import namedtuple
 from difflib import SequenceMatcher
 from itertools import starmap
 
+import nbformat
+
 # QUESTION_RE = r'#+ (Exercise|Question)'
 SOURCE_METADATA_KEY = 'nbcollate_source'
 
@@ -87,16 +89,17 @@ def nbcollate(assignment_nb, answer_nbs, *, ids=None, labels=None, clear_outputs
 
 
 def make_label_cell(label):
-    "Create a cell that labels a collated notebook with ``label``."
+    """Create a cell that labels a collated notebook with ``label``."""
     return nbformat.v4.new_markdown_cell(source='**{}**'.format(label))
 
 
 def cell_strings(nb):
-    "Return a cell's normalized source, for comparison."
+    """Return a cell's normalized source, for comparison."""
     return [cell.source.strip() for cell in nb.cells]
 
 
 def NotebookMatcher(nb1, nb2):
+    """A SequenceMatcher whose sequences are the notebook cell strings."""
     return SequenceMatcher(None, cell_strings(nb1), cell_strings(nb2))
 
 
@@ -149,7 +152,6 @@ def sort_answers(nb):
     Args:
         nb (Notebook): A Jupyter notebook. This is modified in place.
     """
-    dups = []
     out = []
     for _, cells in i_sections(nb):
         out += sorted(cells, key=lambda c: (len(c.source.strip().splitlines()), c.source.strip()))
@@ -157,7 +159,7 @@ def sort_answers(nb):
 
 
 def get_cell_source_id(cell):
-    "Return an answer notebook id that was placed in a cell by :func:`nbcollate`."
+    """Return an answer notebook id that was placed in a cell by :func:`nbcollate`."""
     return getattr(cell.metadata, SOURCE_METADATA_KEY, None)
 
 

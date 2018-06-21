@@ -4,6 +4,9 @@ url = "https://pypi.python.org/simple"
 name = "pypi"
 verify_ssl = true
 
+[scripts]
+
+lint = "flake8 nbcollate"
 
 [dev-packages]
 
@@ -13,6 +16,10 @@ keyring = "*"
 Sphinx = "*"
 bumpversion = "*"
 sphinx_rtd_theme = "*"
+flake8 = "*"
+mccabe = "*"
+pycodestyle = "==2.3.1"  # newer versions are incompatible with flake8 https://github.com/PyCQA/pycodestyle/issues/741
+pyflakes = "*"
 
 
 [packages]
