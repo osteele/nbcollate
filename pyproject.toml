@@ -21,14 +21,14 @@ classifiers = [
     "Topic :: Education",
 ]
 requires = [
-    "nbformat (~=4.4.0)",
-    "minimalkeys (~=0.1.0)",
+    "minimalkeys (~=0.1)",
+    "nbformat (~=4.4)",
 ]
 dev-requires = [
-    "pytest (~=3.2.2)",
-    "keyring",
-    "Sphinx",
     "bumpversion",
+    "keyring",
+    "pytest (~=3.2)",
     "sphinx_rtd_theme",
+    "Sphinx",
 ]
 requires-python = ">=3.5"
