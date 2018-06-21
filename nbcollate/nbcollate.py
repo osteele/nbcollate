@@ -63,9 +63,13 @@ def nbcollate(assignment_nb, answer_nbs, *, ids=None, labels=None, clear_outputs
         answer_nbs = list(answer_nbs.values())
 
     Opcode = namedtuple('opcode', ['op', 'i1', 'i2', 'j1', 'j2'])
+
+    def opcodes(nb):
+        return starmap(Opcode, NotebookMatcher(assignment_nb, nb).get_opcodes())
+
     changes = sorted((oc.i2, i, oc, nb.cells[oc.j1:oc.j2])
                      for i, nb in enumerate(answer_nbs)
-                     for oc in starmap(Opcode, NotebookMatcher(assignment_nb, nb).get_opcodes()))
+                     for oc in opcodes(nb))
     output_cells = assignment_nb.cells[:]
     di = 0
     for _, i, opcode, b_cells in changes:
@@ -152,9 +156,12 @@ def sort_answers(nb):
     Args:
         nb (Notebook): A Jupyter notebook. This is modified in place.
     """
+    def cell_key(cell):
+        return (len(cell.source.strip().splitlines()), cell.source.strip())
+
     out = []
     for _, cells in i_sections(nb):
-        out += sorted(cells, key=lambda c: (len(c.source.strip().splitlines()), c.source.strip()))
+        out += sorted(cells, key=cell_key)
     nb.cells = out
 
 

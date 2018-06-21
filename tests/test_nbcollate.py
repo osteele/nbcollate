@@ -1,8 +1,8 @@
 from collections import OrderedDict
 
-from helpers import maybe_write_notebook, nb_sections, read_notebook, section_contains_string
-from nbcollate import nbcollate, get_answer_tuples, nb_clear_outputs
 import nbcollate as nbc
+from helpers import maybe_write_notebook, nb_sections, read_notebook, section_contains_string
+from nbcollate import get_answer_tuples, nb_clear_outputs, nbcollate
 
 ASSIGNMENT_NB = read_notebook('assignment')
 SUBMISSION_NBS = OrderedDict(

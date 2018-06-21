@@ -7,6 +7,7 @@ verify_ssl = true
 [scripts]
 
 lint = "flake8 nbcollate"
+test = "env PYTHONPATH=. pytest"
 
 [dev-packages]
 

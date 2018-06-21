@@ -10,8 +10,10 @@ import sys
 
 import nbformat
 import nbformat.reader
+
 import nbcollate as nbc
 from minimalkeys import minimal_keys
+
 from . import nbcollate
 
 
@@ -26,12 +28,12 @@ def safe_read(nbf):
 
 
 def capitalize(s):
-    "Upcase the first character in a string s."
+    """Upcase the first character in a string s."""
     return s[:1].upper() + s[1:] if s else s
 
 
 def map_if_uniq(fn, seq):
-    "Return fn mapped across seq, if this doesn't conflate distinct items."
+    """Return fn mapped across seq, if this doesn't conflate distinct items."""
     out = list(map(fn, seq))
     return out if len(set(out)) == len(set(seq)) else seq
 
@@ -84,11 +86,13 @@ def main(args=sys.argv[1:]):
     "Create a collated notebook."
     parser = argparse.ArgumentParser(description=__doc__)
     nb_nargs = '*' if '--version' in args else '+'
-    parser.add_argument('-f', '--force', action='store_true', help="Force overwrite existing file")
+    parser.add_argument('-f', '--force', action='store_true',
+                        help="Force overwrite existing file")
     parser.add_argument('-n', '--dry-run', help="Dry run")
     parser.add_argument('-o', '--out', type=str, help="Output directory")
     parser.add_argument('-v', '--verbose', action='store_true')
-    parser.add_argument('--label', action='store_true', help="Label answers by notebook")
+    parser.add_argument('--label', action='store_true',
+                        help="Label answers by notebook")
     parser.add_argument('--version', action='store_true')
     parser.add_argument('notebook_files', nargs=nb_nargs, metavar='NOTEBOOK_FILE')
     args = parser.parse_args(args)
@@ -105,5 +109,6 @@ def main(args=sys.argv[1:]):
     try:
         collate(master_file, submission_files, args)
     except FileExistsError:
-        sys.stderr.write("Output file already exists. Repeat with --force to replace it.\n")
+        sys.stderr.write("Output file already exists. "
+                         "Repeat with --force to replace it.\n")
         sys.exit(1)
